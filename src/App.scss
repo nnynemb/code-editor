@@ -1,0 +1,27 @@
+.output{
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  width: 50%;
+  bottom: 0px;
+}
+
+.editor{
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 50%;
+  bottom: 0px;
+}
+
+.run-button {
+  position: absolute;
+  height: 75px;
+  top: 0;
+  left: 50%;
+  transform: translate(-50%, 0); /* Centers horizontally at the top */
+  background-color: #ffffff; /* Optional styling */
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+}
