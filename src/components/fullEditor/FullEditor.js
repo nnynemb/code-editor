@@ -20,6 +20,7 @@ const FullEditor = () => {
     const onLanguageSelect = (l) =>{
         setLanguage(l);
     };
+
     return (
         <div className="container">
             <nav className="navbar navbar-light bg-light">
@@ -30,7 +31,7 @@ const FullEditor = () => {
             </nav>
             <div className="row">
                 <div className="col">
-                    <Editor onChange={onChange} language={language} />
+                    <Editor onChange={onChange} handleSave={sendCodeToExecute} language={language} />
                 </div>
                 <div className="col">
                     <Output code={codeToCompile} language={language} />

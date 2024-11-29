@@ -4,6 +4,7 @@ import { python } from "@codemirror/lang-python";
 import { java } from "@codemirror/lang-java";
 import React from "react";
 import "./Editor.scss";
+import { keymap } from "@codemirror/view";
 
 const languageExtensions = {
     "nodejs": javascript({ jsx: true }),
@@ -11,18 +12,27 @@ const languageExtensions = {
     "java": java()
 };
 
-const Editor = ({ onChange, language }) => {
+const Editor = ({ onChange, language, handleSave }) => {
     // Handle the code editor change
     const onCodeChange = React.useCallback((value, viewUpdate) => {
         onChange(value, viewUpdate);
     }, []);
+
     return (
         <div className="editor">
             <CodeMirror
                 value={''}
                 height="100vh"
                 theme="dark"
-                extensions={[languageExtensions[language || "nodejs"]]}
+                extensions={[languageExtensions[language || "nodejs"], keymap.of([
+                    {
+                        key: "Mod-s", // Mod is "Ctrl" on Windows and "Cmd" on Mac
+                        run: () => {
+                            handleSave();
+                            return true; // Prevent default behavior
+                        },
+                    },
+                ])]}
                 onChange={onCodeChange}
             />
         </div>
