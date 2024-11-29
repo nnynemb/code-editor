@@ -25,7 +25,7 @@ const FullEditor = () => {
             <nav className="navbar navbar-light bg-light">
                 <div className="container-fluid">
                     <LanguageSelector onLanguageSelect={onLanguageSelect}/>
-                    <button className="btn btn-primary" onClick={sendCodeToExecute}>Run</button>
+                    <button className="btn btn-sm btn-primary" onClick={sendCodeToExecute}>Run</button>
                 </div>
             </nav>
             <div className="row">

@@ -10,7 +10,7 @@ const LanguageSelector = ({onLanguageSelect}) => {
     },[language])
     return (
         <div className="dropdown">
-            <button className="btn btn-sm btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton2" data-bs-toggle="dropdown" aria-expanded="false">
+            <button className="btn btn-sm btn-dark dropdown-toggle" type="button" id="dropdownMenuButton2" data-bs-toggle="dropdown" aria-expanded="false">
                 {language ? `Selected language : ${language}` : 'Select language'}
             </button>
             <ul className="dropdown-menu dropdown-menu-dark" aria-labelledby="dropdownMenuButton2">
