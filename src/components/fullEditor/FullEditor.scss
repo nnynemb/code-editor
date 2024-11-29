@@ -1,0 +1,26 @@
+.fullEditor {
+    .editorBar {
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        right: 0px;
+        height: 50px;
+
+        .runBtn {
+            position: absolute;
+            left: 50%;
+            justify-content: center;
+            cursor: pointer;
+            padding: 6px 16px;
+            background: #0556f3;
+            font-size: 14px;
+            line-height: 20px;
+            color: #ffffff;
+            border: none;
+            outline: none;
+            border-radius: 2px;
+            z-index: 109;
+            font-weight: bold;
+        }
+    }
+}
