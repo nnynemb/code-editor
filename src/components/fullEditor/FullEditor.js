@@ -17,16 +17,21 @@ const FullEditor = () => {
         setCodeToCompile(code)
     };
 
-    const onLanguageSelect = (l) =>{
+    const onLanguageSelect = (l) => {
         setLanguage(l);
     };
 
+    const clearOutput = () => {
+        setCodeToCompile("")
+    };
+
     return (
-        <div className="container">
+        <div className="container-fluid">
             <nav className="navbar navbar-light bg-light">
                 <div className="container-fluid">
-                    <LanguageSelector onLanguageSelect={onLanguageSelect}/>
+                    <LanguageSelector onLanguageSelect={onLanguageSelect} />
                     <button className="btn btn-sm btn-primary" onClick={sendCodeToExecute}>Run</button>
+                    <button className="btn btn-sm btn-danger" onClick={clearOutput}>clear</button>
                 </div>
             </nav>
             <div className="row">
