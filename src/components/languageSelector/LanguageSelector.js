@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import "./LanguageSelector.scss";
 const languages = [
-    "NodeJS", "Python", "Java"
+    "javascript", "python"
 ];
 const LanguageSelector = ({onLanguageSelect}) => {
-    const [language, selectLanguage] = useState("nodejs");
+    const [language, selectLanguage] = useState("javascript");
     useEffect(()=>{
         onLanguageSelect(language)
     },[language])

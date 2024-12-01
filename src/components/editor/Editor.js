@@ -8,6 +8,7 @@ import { keymap } from "@codemirror/view";
 
 const languageExtensions = {
     "nodejs": javascript({ jsx: true }),
+    "javascript": javascript({ jsx: true }),
     "python": python(),
     "java": java()
 };
