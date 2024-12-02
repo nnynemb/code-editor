@@ -27,14 +27,21 @@ export default function FullEditor() {
 
     // Execute the JavaScript code
     async function executeCode(codeString, language) {
-        console.log(codeString, language)
         if (codeString && language) {
             // const outputElement = document.getElementById("output");
             // Clear previous output
             // outputElement.innerHTML = '';
             const compiledResponse = await compilerService.runCode({ code: codeString, language });
-            console.log(compiledResponse)
-            setOutput(compiledResponse.data.output)
+            const reader = compiledResponse.body.getReader();
+            reader.read().then(function processText({ done, value }) {
+                if (done) {
+                    console.log('Stream ended');
+                    return;
+                }
+                const data = new TextDecoder().decode(value);
+                setOutput(data)
+                return reader.read().then(processText);
+            });
         }
     }
 
