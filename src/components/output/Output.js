@@ -1,11 +1,9 @@
 import "./Output.scss";
 
 const Output = ({ output }) => {
-
+    const htmlContent = output.replace(/\n/g, "<br>");
     return (
-        <div className="output" id="output">
-            {output}
-        </div>
+        <div className="output" dangerouslySetInnerHTML={{ __html: htmlContent }}/>
     );
 };
 

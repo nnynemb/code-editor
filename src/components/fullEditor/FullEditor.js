@@ -9,6 +9,7 @@ export default function FullEditor() {
     const [code, setCode] = useState('');
     const [language, setLanguage] = useState('');
     const [output, setOutput] = useState('')
+    const [loading, setLoading] = useState(false);
 
     const onChange = (changedCode, view) => {
         setCode(changedCode)
@@ -23,23 +24,35 @@ export default function FullEditor() {
     };
 
     const clearOutput = () => {
+        setOutput('');
     };
 
     // Execute the JavaScript code
     async function executeCode(codeString, language) {
         if (codeString && language) {
-            // const outputElement = document.getElementById("output");
-            // Clear previous output
-            // outputElement.innerHTML = '';
+            setLoading(true);
+            setOutput('');
             const compiledResponse = await compilerService.runCode({ code: codeString, language });
             const reader = compiledResponse.body.getReader();
             reader.read().then(function processText({ done, value }) {
                 if (done) {
                     console.log('Stream ended');
+                    setLoading(false)
                     return;
                 }
                 const data = new TextDecoder().decode(value);
-                setOutput(data)
+                setOutput((previousOutput) => {
+                    // Trim the previous output to avoid trailing newlines
+                    const trimmedOutput = previousOutput.trimEnd();
+
+                    // If previousOutput is empty, add `d` directly without a newline
+                    if (!trimmedOutput) {
+                        return data;
+                    }
+
+                    // If the last character is not a newline, add `\n` before `d`
+                    return `${trimmedOutput}\n${data}`;
+                });
                 return reader.read().then(processText);
             });
         }
@@ -50,7 +63,7 @@ export default function FullEditor() {
             <nav className="navbar navbar-light bg-light">
                 <div className="container-fluid">
                     <LanguageSelector onLanguageSelect={onLanguageSelect} />
-                    <button className="btn btn-sm btn-primary" onClick={sendCodeToExecute}>run</button>
+                    <button disabled={loading} className="btn btn-sm btn-primary" onClick={sendCodeToExecute}>run</button>
                     <button className="btn btn-sm btn-danger" onClick={clearOutput}>clear</button>
                 </div>
             </nav>
