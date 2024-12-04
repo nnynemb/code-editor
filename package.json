@@ -2,7 +2,7 @@
   "name": "ide",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://ghoshpushpendu.github.io/code-editor",
+  "homepage": "https://nnynemb.github.io/code-editor",
   "dependencies": {
     "@codemirror/lang-java": "^6.0.1",
     "@codemirror/lang-javascript": "^6.2.2",
