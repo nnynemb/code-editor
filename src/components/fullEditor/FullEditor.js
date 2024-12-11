@@ -59,12 +59,14 @@ export default function FullEditor() {
     }
 
     return (
-        <div className="container-fluid">
+        <div className="full-editor container-fluid">
             <nav className="navbar navbar-light bg-light">
                 <div className="container-fluid">
                     <LanguageSelector onLanguageSelect={onLanguageSelect} />
-                    <button disabled={loading} className="btn btn-sm btn-primary" onClick={sendCodeToExecute}>run</button>
-                    <button className="btn btn-sm btn-danger" onClick={clearOutput}>clear</button>
+                    <button className="btn btn-success" type="button" disabled={loading} onClick={sendCodeToExecute}>
+                        {loading ? <span><span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Running</span> : <span><i class="bi bi-play-fill"></i> Run</span>}
+                    </button>
+                    <button className="btn btn-danger" onClick={clearOutput} disabled={loading}>Clear</button>
                 </div>
             </nav>
             <div className="row">
