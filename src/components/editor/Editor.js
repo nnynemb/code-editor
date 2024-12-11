@@ -13,7 +13,7 @@ const languageExtensions = {
     "java": java()
 };
 
-const Editor = ({ onChange, language, handleSave }) => {
+const Editor = ({ onChange, language, handleSave, code }) => {
     // Handle the code editor change
     const onCodeChange = React.useCallback((value, viewUpdate) => {
         onChange(value, viewUpdate);
@@ -22,7 +22,7 @@ const Editor = ({ onChange, language, handleSave }) => {
     return (
         <div className="editor">
             <CodeMirror
-                value={''}
+                value={code}
                 height="100vh"
                 theme="dark"
                 extensions={[languageExtensions[language || "nodejs"], keymap.of([

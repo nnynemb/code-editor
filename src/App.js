@@ -13,7 +13,7 @@ function App() {
         <Route path="/" element={<Home />} />
 
         {/* Dynamic Route */}
-        <Route path="/editor/:userId" element={<FullEditor />} />
+        <Route path="/editor/:sessionId" element={<FullEditor />} />
       </Routes>
     </Router>
   );
