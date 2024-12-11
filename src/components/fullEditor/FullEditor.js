@@ -64,7 +64,7 @@ export default function FullEditor() {
                 <div className="container-fluid">
                     <LanguageSelector onLanguageSelect={onLanguageSelect} />
                     <button className="btn btn-success" type="button" disabled={loading} onClick={sendCodeToExecute}>
-                        {loading ? <span><span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Running</span> : <span><i class="bi bi-play-fill"></i> Run</span>}
+                        {loading ? <span><span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Running</span> : <span><i className="bi bi-play-fill"></i> Run</span>}
                     </button>
                     <button className="btn btn-danger" onClick={clearOutput} disabled={loading}>Clear</button>
                 </div>

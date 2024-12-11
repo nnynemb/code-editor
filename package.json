@@ -4,6 +4,7 @@
   "private": true,
   "homepage": "https://nnynemb.github.io/code-editor",
   "dependencies": {
+    "@apollo/client": "^3.12.2",
     "@codemirror/lang-java": "^6.0.1",
     "@codemirror/lang-javascript": "^6.2.2",
     "@codemirror/lang-python": "^6.1.6",
@@ -13,8 +14,10 @@
     "@testing-library/user-event": "^13.5.0",
     "@uiw/react-codemirror": "^4.23.6",
     "axios": "^1.7.8",
+    "graphql": "^16.9.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-router-dom": "^7.0.2",
     "react-scripts": "5.0.1",
     "sass": "^1.81.0",
     "web-vitals": "^2.1.4"

@@ -1,13 +1,21 @@
 import React from "react";
 import "./App.scss";
 import FullEditor from "./components/fullEditor/FullEditor";
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import Home from "./components/home/Home";
 
 function App() {
 
   return (
-    <div>
-      <FullEditor />
-    </div>
+    <Router>
+      <Routes>
+        {/* Static Route */}
+        <Route path="/" element={<Home />} />
+
+        {/* Dynamic Route */}
+        <Route path="/editor/:userId" element={<FullEditor />} />
+      </Routes>
+    </Router>
   );
 }
 
