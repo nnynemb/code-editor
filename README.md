@@ -6,7 +6,7 @@ This is a demo project showcasing a **Code Editor** built with ReactJS. The appl
 
 You can view and interact with the live demo of this project at the following URL:
 
-[**Code Editor Live Demo**](https://nnynemb.github.io/code-editor/)
+[**Code Editor Live Demo**](https://nnynemb.vercel.app)
 
 ---
 
