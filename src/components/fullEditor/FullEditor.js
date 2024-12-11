@@ -32,7 +32,7 @@ const UPDATE_SESSION = gql`
 export default function FullEditor() {
   const { sessionId } = useParams(); // Extract sessionId from URL
   const [code, setCode] = useState("");
-  const [language, setLanguage] = useState("");
+  const [language, setLanguage] = useState("javascript");
   const [output, setOutput] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -81,7 +81,7 @@ export default function FullEditor() {
     if (codeString && selectedLanguage) {
       setLoading(true);
       setOutput("");
-      const compiledResponse = await compilerService.runCode({ code: codeString, language: selectedLanguage });
+      const compiledResponse = await compilerService.runCode({ code: codeString, language: selectedLanguage?.toLowerCase() });
       const reader = compiledResponse.body.getReader();
       reader.read().then(function processText({ done, value }) {
         if (done) {
