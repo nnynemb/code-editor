@@ -13,7 +13,6 @@ const languageExtensions = {
 };
 
 const Editor = ({ onChange, language, handleSave, code }) => {
-    console.log(language)
     // Handle the code editor change
     const onCodeChange = React.useCallback((value, viewUpdate) => {
         onChange(value, viewUpdate);
@@ -25,17 +24,25 @@ const Editor = ({ onChange, language, handleSave, code }) => {
                 value={code}
                 height="100vh"
                 theme="dark"
-                extensions={[languageExtensions[language?.toLowerCase() || "javascript"], keymap.of([
-                    {
-                        key: "Mod-s", // Mod is "Ctrl" on Windows and "Cmd" on Mac
-                        run: () => {
-                            handleSave();
-                            return true; // Prevent default behavior
+                extensions={[
+                    languageExtensions[language?.toLowerCase() || "javascript"],
+                    keymap.of([
+                        {
+                            key: "Mod-s", // Mod is "Ctrl" on Windows and "Cmd" on Mac
+                            run: () => {
+                                handleSave();
+                                return true; // Prevent default behavior
+                            },
                         },
-                    },
-                ])]}
+                    ])
+                ]}
                 onChange={onCodeChange}
+                style={{
+                    fontSize: '14px', // Change this to your desired font size
+                    fontFamily: "'Courier New', Courier, monospace", // Optional: Set a specific font family
+                }}
             />
+
         </div>
     );
 };
