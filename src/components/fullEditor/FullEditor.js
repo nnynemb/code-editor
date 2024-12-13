@@ -109,19 +109,19 @@ export default function FullEditor() {
     document.addEventListener("mousemove", onDrag);
     document.addEventListener("mouseup", stopDrag);
   };
-
+  
   const onDrag = (e) => {
     if (!isDragging) return;
-
     const newDividerPosition = Math.min(Math.max(0, (e.clientX / window.innerWidth) * 100), 100);
     setDividerPosition(newDividerPosition);
   };
-
-  const stopDrag = () => {
+  
+  const stopDrag = (e) => {
     setIsDragging(false);
     document.removeEventListener("mousemove", onDrag);
     document.removeEventListener("mouseup", stopDrag);
-  };
+  };  
+
 
   if (sessionError) {
     return <div>Error loading session: {sessionError.message}</div>;
@@ -179,9 +179,10 @@ export default function FullEditor() {
 
         <div
           className="divider"
-          onMouseDown={startDrag}
+          onMouseDown={startDrag}  // Ensure this is properly set
           style={{ left: `${dividerPosition}%` }}
         />
+
 
         <div className="col" ref={rightColumnRef} style={{ width: `${100 - dividerPosition}%` }}>
           <div className="output-container">
