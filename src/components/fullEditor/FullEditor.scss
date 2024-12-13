@@ -37,6 +37,18 @@ $button-hover-bg: #0056b3; // Primary button hover color
             padding: 0; // Remove any extra padding
         }
 
+        // Navbar Styles
+        .btn-info {
+            background-color: #17a2b8;
+            border: none;
+
+            &:hover {
+                background-color: darken(#17a2b8, 10%);
+            }
+        }
+
+
+
         .btn {
             font-size: 0.85rem; // Reduced font size for a more compact look
             font-weight: 500;

@@ -120,8 +120,20 @@ export default function FullEditor() {
     setIsDragging(false);
     document.removeEventListener("mousemove", onDrag);
     document.removeEventListener("mouseup", stopDrag);
-  };  
+  };
 
+  // Handle the Share Button functionality
+  const shareSession = () => {
+    const shareLink = `${window.location.href}`;
+    navigator.clipboard.writeText(shareLink)
+      .then(() => {
+        alert("Session link copied to clipboard!");
+      })
+      .catch((error) => {
+        console.error("Error copying to clipboard:", error);
+        alert("Failed to copy link.");
+      });
+  };
 
   if (sessionError) {
     return <div>Error loading session: {sessionError.message}</div>;
@@ -166,6 +178,9 @@ export default function FullEditor() {
             <button className="btn btn-danger ms-2" onClick={clearOutput} disabled={loading}>
               Clear
             </button>
+            <button className="btn btn-info ms-2" onClick={shareSession}>
+              <i className="bi bi-share"></i> Share
+            </button>
           </div>
         </div>
       </nav>
@@ -182,7 +197,6 @@ export default function FullEditor() {
           onMouseDown={startDrag}  // Ensure this is properly set
           style={{ left: `${dividerPosition}%` }}
         />
-
 
         <div className="col" ref={rightColumnRef} style={{ width: `${100 - dividerPosition}%` }}>
           <div className="output-container">
