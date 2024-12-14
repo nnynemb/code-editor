@@ -1,4 +1,4 @@
-const base_url =  process.env.REACT_APP_API;
+const base_url =  process.env.REACT_APP_COMPILER_API;
 
 const compilerService = {
     runCode: ({ code, language }) => {
