@@ -6,6 +6,7 @@ import Output from "../output/Output";
 import LanguageSelector from "../languageSelector/LanguageSelector";
 import compilerService from "./../../services/api";
 import "./FullEditor.scss";  // Import the SCSS
+import { useSocket } from "./../../context/Socket.IO.Context";
 
 // GraphQL Queries and Mutations
 const GET_SESSION = gql`
@@ -40,6 +41,9 @@ export default function FullEditor() {
 
   const leftColumnRef = useRef();
   const rightColumnRef = useRef();
+  const socket = useSocket();
+
+  console.log(socket.id)
 
   // GraphQL hooks
   const { data, loading: loadingSession, error: sessionError } = useQuery(GET_SESSION, {

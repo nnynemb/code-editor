@@ -3,19 +3,21 @@ import "./App.scss";
 import FullEditor from "./components/fullEditor/FullEditor";
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Home from "./components/home/Home";
-
+import { SocketProvider } from "./context/Socket.IO.Context";
 function App() {
 
   return (
-    <Router>
-      <Routes>
-        {/* Static Route */}
-        <Route path="/" element={<Home />} />
+    <SocketProvider>
+      <Router>
+        <Routes>
+          {/* Static Route */}
+          <Route path="/" element={<Home />} />
 
-        {/* Dynamic Route */}
-        <Route path="/editor/:sessionId" element={<FullEditor />} />
-      </Routes>
-    </Router>
+          {/* Dynamic Route */}
+          <Route path="/editor/:sessionId" element={<FullEditor />} />
+        </Routes>
+      </Router>
+    </SocketProvider>
   );
 }
 
