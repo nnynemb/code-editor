@@ -43,8 +43,6 @@ export default function FullEditor() {
   const rightColumnRef = useRef();
   const socket = useSocket();
 
-  console.log(socket.id)
-
   // GraphQL hooks
   const { data, loading: loadingSession, error: sessionError } = useQuery(GET_SESSION, {
     variables: { id: sessionId },
@@ -63,6 +61,11 @@ export default function FullEditor() {
 
   const onChange = (changedCode) => {
     setCode(changedCode);
+    const data = { code: changedCode, language };
+    // Emit with a callback for acknowledgment
+    socket.emit(sessionId, data, (response) => {
+      console.log('Server acknowledged:', response);
+    });
   };
 
   const sendCodeToExecute = () => {
@@ -84,6 +87,26 @@ export default function FullEditor() {
       });
     }
   };
+
+  useEffect(() => {
+    // Join the room directly after the connection is established
+    socket && sessionId && socket.on('connect', () => {
+      console.log(`Connected with socket ID: ${socket.id}`);
+      socket.emit('joinRoom', sessionId); // Join the room after connection
+    });
+
+    // get the code chnage events from the server
+    socket && sessionId && socket.on(sessionId, (data) => {
+      const channel = data.channel;
+      const remotelanguage = data.language;
+      const content = data.content;
+      if (channel === sessionId) {
+        if (content) setCode(content);
+        if (remotelanguage) setLanguage(language);
+      }
+    });
+
+  }, [socket, sessionId]);
 
   // Execute the code
   async function executeCode(codeString, selectedLanguage) {
@@ -113,13 +136,13 @@ export default function FullEditor() {
     document.addEventListener("mousemove", onDrag);
     document.addEventListener("mouseup", stopDrag);
   };
-  
+
   const onDrag = (e) => {
     if (!isDragging) return;
     const newDividerPosition = Math.min(Math.max(0, (e.clientX / window.innerWidth) * 100), 100);
     setDividerPosition(newDividerPosition);
   };
-  
+
   const stopDrag = (e) => {
     setIsDragging(false);
     document.removeEventListener("mousemove", onDrag);

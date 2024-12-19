@@ -31,7 +31,7 @@ function Home() {
         const { data } = await generateSession({
           variables: {
             language: "JavaScript",
-            content: "console.log(GraphQL with React is powerful!);",
+            content: "console.log(`GraphQL with React is powerful!`);",
           },
         });
         if (data?.generateSession?.id) {
