@@ -97,10 +97,12 @@ export default function FullEditor() {
 
     // get the code chnage events from the server
     socket && sessionId && socket.on(sessionId, (data) => {
+      console.log('Received code change event:', data); 
       const channel = data.channel;
       const remotelanguage = data.language;
       const content = data.content;
-      if (channel === sessionId) {
+      const senderSocketId = data.senderSocketId;
+      if (channel === sessionId && senderSocketId !== socket.id) {
         if (content) setCode(content);
         if (remotelanguage) setLanguage(language);
       }
