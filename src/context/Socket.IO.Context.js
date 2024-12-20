@@ -2,7 +2,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { io } from 'socket.io-client';
 
 const SocketContext = createContext();
-const SOCKET_SERVER_URL = process.env.REACT_APP_GRAPHQL_API;
+const SOCKET_SERVER_URL = process.env.REACT_APP_SOCKET_URL;
 
 export const SocketProvider = ({ children }) => {
   const [socket, setSocket] = useState(null);
