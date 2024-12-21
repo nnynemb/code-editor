@@ -153,6 +153,7 @@ export default function FullEditor() {
   // Execute the code
   async function executeCode(codeString, selectedLanguage) {
     if (codeString && selectedLanguage && sessionId) {
+      setLoading(true);
       const response = await compilerService.runCode({ code: codeString, language: selectedLanguage?.toLowerCase(), sessionId });
       const text = await response.text();
       setOutput((previousOutput) => {
