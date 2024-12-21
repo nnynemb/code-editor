@@ -23,7 +23,7 @@ const Editor = ({ onChange, language, handleSave, code }) => {
             <CodeMirror
                 value={code}
                 height="100vh"
-                theme="dark"
+                theme="light"
                 extensions={[
                     languageExtensions[language?.toLowerCase() || "javascript"],
                     keymap.of([

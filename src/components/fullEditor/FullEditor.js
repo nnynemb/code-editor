@@ -43,6 +43,8 @@ export default function FullEditor() {
   const rightColumnRef = useRef();
   const socket = useSocket();
 
+  const username = "Guest"; // Hardcoded username for now
+
   // GraphQL hooks
   const { data, loading: loadingSession, error: sessionError } = useQuery(GET_SESSION, {
     variables: { id: sessionId },
@@ -61,7 +63,7 @@ export default function FullEditor() {
 
   const onChange = (changedCode) => {
     setCode(changedCode);
-    const data = { code: changedCode, language };
+    const data = { code: changedCode, language, username: username };
     // Emit with a callback for acknowledgment
     socket.emit(sessionId, data, (response) => {
       console.log('Server acknowledged:', response);
@@ -97,7 +99,7 @@ export default function FullEditor() {
 
     // get the code chnage events from the server
     socket && sessionId && socket.on(sessionId, (data) => {
-      console.log('Received code change event:', data); 
+      console.log('Received code change event:', data);
       const channel = data.channel;
       const remotelanguage = data.language;
       const content = data.content;
@@ -108,26 +110,48 @@ export default function FullEditor() {
       }
     });
 
+    // get the output events from the server
+    socket && sessionId && socket.on('output', (data) => {
+      console.log('Received code change event:', data);
+      const { output, sessionId: sid } = data;
+      if (sid === sessionId) {
+        setOutput((previousOutput) => {
+          const trimmedOutput = previousOutput.trimEnd();
+          const timestampedOutput = `${new Date().toLocaleTimeString()} - ${output}`;
+          return trimmedOutput ? `${trimmedOutput}\n${timestampedOutput}` : timestampedOutput;
+        });
+      }
+    });
+
+    // get the command events from the server
+    socket && sessionId && socket.on('command', (data) => {
+      console.log('Received code change event:', data);
+      const { command, sessionId: sid } = data;
+      if (sid === sessionId) {
+        switch (command) {
+          case 'start':
+            setOutput("");
+            setLoading(true);
+            break;
+          case 'end':
+            setLoading(false);
+            break;
+          default:
+            console.log('Unknown command:', command);
+        }
+      }
+    });
+
   }, [socket, sessionId]);
 
   // Execute the code
   async function executeCode(codeString, selectedLanguage) {
-    if (codeString && selectedLanguage) {
-      setLoading(true);
-      setOutput("");
-      const compiledResponse = await compilerService.runCode({ code: codeString, language: selectedLanguage?.toLowerCase() });
-      const reader = compiledResponse.body.getReader();
-      reader.read().then(function processText({ done, value }) {
-        if (done) {
-          setLoading(false);
-          return;
-        }
-        const data = new TextDecoder().decode(value);
-        setOutput((previousOutput) => {
-          const trimmedOutput = previousOutput.trimEnd();
-          return trimmedOutput ? `${trimmedOutput}\n${data}` : data;
-        });
-        return reader.read().then(processText);
+    if (codeString && selectedLanguage && sessionId) {
+      const response = await compilerService.runCode({ code: codeString, language: selectedLanguage?.toLowerCase(), sessionId });
+      const text = await response.text();
+      setOutput((previousOutput) => {
+        const trimmedOutput = previousOutput.trimEnd();
+        return trimmedOutput ? `${trimmedOutput}\n${text}` : text;
       });
     }
   }
@@ -214,20 +238,15 @@ export default function FullEditor() {
         </div>
       </nav>
 
-      <div className="content">
-        <div className="col" ref={leftColumnRef} style={{ width: `${dividerPosition}%` }}>
+      <div className="row g-0">
+        <div className="col-8" ref={leftColumnRef}>
           <div className="editor-container">
             <Editor onChange={onChange} handleSave={sendCodeToExecute} code={code} language={language} />
           </div>
         </div>
 
-        <div
-          className="divider"
-          onMouseDown={startDrag}  // Ensure this is properly set
-          style={{ left: `${dividerPosition}%` }}
-        />
-
-        <div className="col" ref={rightColumnRef} style={{ width: `${100 - dividerPosition}%` }}>
+        <div className="col-4" ref={rightColumnRef}>
+          <div className="navbar navbar-light bg-light">Output section</div>
           <div className="output-container">
             <Output output={output} />
           </div>
