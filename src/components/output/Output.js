@@ -1,9 +1,23 @@
 import "./Output.scss";
+import CodeMirror from "@uiw/react-codemirror";
 
 const Output = ({ output }) => {
     const htmlContent = output.replace(/\n/g, "<br>");
     return (
-        <div className="output ml-2" dangerouslySetInnerHTML={{ __html: htmlContent }}/>
+        <div className="output">
+            <CodeMirror
+                value={output}
+                options={{
+                    mode: 'text', // Use plain text mode
+                    lineNumbers: true, // Enable line numbers if needed
+                    readOnly: true, // Make it read-only
+                    theme: 'default', // Adjust theme as needed
+                }}
+                onBeforeChange={(editor, data, value) => {
+                    // Prevent editing
+                }}
+            />
+        </div>
     );
 };
 

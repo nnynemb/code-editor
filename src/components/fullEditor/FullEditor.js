@@ -65,9 +65,7 @@ export default function FullEditor() {
     setCode(changedCode);
     const data = { code: changedCode, language, username: username };
     // Emit with a callback for acknowledgment
-    socket.emit(sessionId, data, (response) => {
-      console.log('Server acknowledged:', response);
-    });
+    socket.emit(sessionId, data);
   };
 
   const sendCodeToExecute = () => {
@@ -93,13 +91,11 @@ export default function FullEditor() {
   useEffect(() => {
     // Join the room directly after the connection is established
     socket && sessionId && socket.on('connect', () => {
-      console.log(`Connected with socket ID: ${socket.id}`);
       socket.emit('joinRoom', sessionId); // Join the room after connection
     });
 
     // get the code chnage events from the server
     socket && sessionId && socket.on(sessionId, (data) => {
-      console.log('Received code change event:', data);
       const channel = data.channel;
       const remotelanguage = data.language;
       const content = data.content;
@@ -112,20 +108,30 @@ export default function FullEditor() {
 
     // get the output events from the server
     socket && sessionId && socket.on('output', (data) => {
-      console.log('Received code change event:', data);
       const { output, sessionId: sid } = data;
+
       if (sid === sessionId) {
         setOutput((previousOutput) => {
+          // Trim the previous output
           const trimmedOutput = previousOutput.trimEnd();
-          const timestampedOutput = `${new Date().toLocaleTimeString()} - ${output}`;
-          return trimmedOutput ? `${trimmedOutput}\n${timestampedOutput}` : timestampedOutput;
+
+          // Split the new output by newline, filter out empty lines, and join them back
+          const numberedOutput = output
+            .split('\n') // Split the output into lines
+            .filter((line) => line.trim() !== '') // Omit empty lines
+            .join('\n'); // Join the lines back with newline characters
+
+          // Combine with the previous output
+          return trimmedOutput
+            ? `${trimmedOutput}\n${numberedOutput}`
+            : numberedOutput;
         });
       }
     });
 
+
     // get the command events from the server
     socket && sessionId && socket.on('command', (data) => {
-      console.log('Received code change event:', data);
       const { command, sessionId: sid } = data;
       if (sid === sessionId) {
         switch (command) {
@@ -229,7 +235,7 @@ export default function FullEditor() {
               )}
             </button>
             <button className="btn btn-danger ms-2" onClick={clearOutput} disabled={loading}>
-              Clear
+              Clear output
             </button>
             <button className="btn btn-info ms-2" onClick={shareSession}>
               <i className="bi bi-share"></i> Share
@@ -244,9 +250,7 @@ export default function FullEditor() {
             <Editor onChange={onChange} handleSave={sendCodeToExecute} code={code} language={language} />
           </div>
         </div>
-
         <div className="col-4" ref={rightColumnRef}>
-          <div className="navbar navbar-light bg-light">Output section</div>
           <div className="output-container">
             <Output output={output} />
           </div>
