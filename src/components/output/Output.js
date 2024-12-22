@@ -13,9 +13,6 @@ const Output = ({ output }) => {
                     readOnly: true, // Make it read-only
                     theme: 'default', // Adjust theme as needed
                 }}
-                onBeforeChange={(editor, data, value) => {
-                    // Prevent editing
-                }}
             />
         </div>
     );

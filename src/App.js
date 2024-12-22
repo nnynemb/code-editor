@@ -4,6 +4,8 @@ import FullEditor from "./components/fullEditor/FullEditor";
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Home from "./components/home/Home";
 import { SocketProvider } from "./context/Socket.IO.Context";
+import 'bootstrap/dist/css/bootstrap.min.css';
+
 function App() {
 
   return (

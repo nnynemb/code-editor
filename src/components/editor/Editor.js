@@ -5,7 +5,6 @@ import { java } from "@codemirror/lang-java";
 import React from "react";
 import "./Editor.scss";
 import { keymap } from "@codemirror/view";
-
 const languageExtensions = {
     "javascript": javascript({ jsx: true }),
     "python": python(),

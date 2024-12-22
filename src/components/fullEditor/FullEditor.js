@@ -7,6 +7,9 @@ import LanguageSelector from "../languageSelector/LanguageSelector";
 import compilerService from "./../../services/api";
 import "./FullEditor.scss";  // Import the SCSS
 import { useSocket } from "./../../context/Socket.IO.Context";
+import AskUsername from "../askUsername/AskUsername";
+import * as bootstrap from "bootstrap";
+import { generateCartoonHeroName } from "../../utils/randomizer.util";
 
 // GraphQL Queries and Mutations
 const GET_SESSION = gql`
@@ -38,12 +41,31 @@ export default function FullEditor() {
   const [loading, setLoading] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [dividerPosition, setDividerPosition] = useState(50); // percentage of column width for divider
+  const [isSavingModalData, setIsSavingModalData] = useState(false);
+  const [cursors, setCursors] = useState({});
 
   const leftColumnRef = useRef();
   const rightColumnRef = useRef();
+  const modalRef = useRef();
+  const modalInstanceRef = useRef(null); // Ref for the modal instance
   const socket = useSocket();
 
-  const username = "Guest"; // Hardcoded username for now
+  const [username] = useState(() => generateCartoonHeroName());
+
+  // TODO: Implement the modal instance
+  // useEffect(() => {
+  //   console.log("sessionId:", modalRef);
+  //   const interval = setInterval(() => {
+  //     if (modalRef.current) {
+  //       clearInterval(interval);
+  //       modalInstanceRef.current = new bootstrap.Modal(modalRef.current, {
+  //         keyboard: false,
+  //         backdrop: "static",
+  //       });
+  //       modalInstanceRef.current.show(); // Automatically show the modal
+  //     }
+  //   }, 500);
+  // }, []);
 
   // GraphQL hooks
   const { data, loading: loadingSession, error: sessionError } = useQuery(GET_SESSION, {
@@ -61,9 +83,18 @@ export default function FullEditor() {
     },
   });
 
-  const onChange = (changedCode) => {
+  const onChange = (changedCode, viewUpdate) => {
+    const cursorPos = viewUpdate.state.selection.main.head;
+    const line = viewUpdate.state.doc.lineAt(cursorPos);
+    const column = cursorPos - line.from;
+
     setCode(changedCode);
-    const data = { code: changedCode, language, username: username };
+    const data = {
+      code: changedCode, language, username: username, cursor: {
+        content: `${username} is typing...`,
+        position: { line: line.number - 1, column: column }
+      }
+    };
     // Emit with a callback for acknowledgment
     socket.emit(sessionId, data);
   };
@@ -89,6 +120,10 @@ export default function FullEditor() {
   };
 
   useEffect(() => {
+    console.log("cursors:", cursors);
+  }, [cursors]);
+
+  useEffect(() => {
     // Join the room directly after the connection is established
     socket && sessionId && socket.on('connect', () => {
       socket.emit('joinRoom', sessionId); // Join the room after connection
@@ -96,13 +131,23 @@ export default function FullEditor() {
 
     // get the code chnage events from the server
     socket && sessionId && socket.on(sessionId, (data) => {
+      console.log("Received data:", data);
       const channel = data.channel;
       const remotelanguage = data.language;
       const content = data.content;
       const senderSocketId = data.senderSocketId;
+      const cursor = data.cursor;
       if (channel === sessionId && senderSocketId !== socket.id) {
         if (content) setCode(content);
         if (remotelanguage) setLanguage(language);
+        if (cursor) {
+          setCursors((previousCursors) => {
+            const newCursors = { ...previousCursors };
+            newCursors[senderSocketId] = data.cursor;
+            newCursors[senderSocketId].username = data.username;
+            return newCursors;
+          });
+        }
       }
     });
 
@@ -209,6 +254,16 @@ export default function FullEditor() {
     );
   }
 
+  const saveUserData = (userData) => {
+    if (!userData.name || !userData.email) {
+      alert("Name and Email are required!");
+      return;
+    }
+    setIsSavingModalData(true);
+    modalInstanceRef.current.hide();
+    socket.emit(sessionId, { type: 'addUser', ...userData });
+  };
+
   return (
     <div className="full-editor">
       <nav className="navbar navbar-expand-lg">
@@ -241,6 +296,7 @@ export default function FullEditor() {
             <button className="btn btn-info ms-2" onClick={shareSession}>
               <i className="bi bi-share"></i> Share
             </button>
+            <AskUsername modalRef={modalRef} saveUserData={saveUserData} isLoading={isSavingModalData} />
           </div>
         </div>
       </nav>
@@ -248,7 +304,10 @@ export default function FullEditor() {
       <div className="row g-0">
         <div className="col-8" ref={leftColumnRef}>
           <div className="editor-container">
-            <Editor onChange={onChange} handleSave={sendCodeToExecute} code={code} language={language} />
+            <Editor onChange={onChange} handleSave={sendCodeToExecute} code={code} language={language} cursors={[
+              { content: 'User 1', line: 3, column: 5 },
+              { content: 'User 2', line: 6, column: 12 },
+            ]} />
           </div>
         </div>
         <div className="col-4" ref={rightColumnRef}>
