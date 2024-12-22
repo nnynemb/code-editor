@@ -10,6 +10,7 @@ import { useSocket } from "./../../context/Socket.IO.Context";
 import AskUsername from "../askUsername/AskUsername";
 import * as bootstrap from "bootstrap";
 import { generateCartoonHeroName } from "../../utils/randomizer.util";
+import { v4 as uuidv4 } from 'uuid';
 
 // GraphQL Queries and Mutations
 const GET_SESSION = gql`
@@ -51,6 +52,7 @@ export default function FullEditor() {
   const socket = useSocket();
 
   const [username] = useState(() => generateCartoonHeroName());
+  const [sessionIdGenerated] = useState(() => uuidv4());
 
   // TODO: Implement the modal instance
   // useEffect(() => {
@@ -83,16 +85,14 @@ export default function FullEditor() {
     },
   });
 
-  const onChange = (changedCode, viewUpdate) => {
-    const cursorPos = viewUpdate.state.selection.main.head;
-    const line = viewUpdate.state.doc.lineAt(cursorPos);
-    const column = cursorPos - line.from;
-
-    setCode(changedCode);
+  const onChange = (changedCode) => {
+    if (!sessionId || !sessionIdGenerated) return;
     const data = {
-      code: changedCode, language, username: username, cursor: {
+      code: changedCode, language, username: username, 
+      userId: sessionIdGenerated,
+      cursor: {
         content: `${username} is typing...`,
-        position: { line: line.number - 1, column: column }
+        position: { line: 1, column: 1 }
       }
     };
     // Emit with a callback for acknowledgment
@@ -131,13 +131,13 @@ export default function FullEditor() {
 
     // get the code chnage events from the server
     socket && sessionId && socket.on(sessionId, (data) => {
-      console.log("Received data:", data);
       const channel = data.channel;
       const remotelanguage = data.language;
       const content = data.content;
       const senderSocketId = data.senderSocketId;
       const cursor = data.cursor;
-      if (channel === sessionId && senderSocketId !== socket.id) {
+      const userId = data.userId;
+      if (userId && sessionIdGenerated && channel === sessionId && senderSocketId !== socket.id && userId !== sessionIdGenerated) {
         if (content) setCode(content);
         if (remotelanguage) setLanguage(language);
         if (cursor) {
@@ -192,8 +192,16 @@ export default function FullEditor() {
         }
       }
     });
+    
+
+    return () => {
+      socket && sessionId && socket.off(sessionId);
+      socket && sessionId && socket.off('output');
+      socket && sessionId && socket.off('command');
+    };
 
   }, [socket, sessionId]);
+  
 
   // Execute the code
   async function executeCode(codeString, selectedLanguage) {

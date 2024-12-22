@@ -1,49 +1,37 @@
-import CodeMirror from "@uiw/react-codemirror";
-import { javascript } from "@codemirror/lang-javascript";
-import { python } from "@codemirror/lang-python";
-import { java } from "@codemirror/lang-java";
-import React from "react";
-import "./Editor.scss";
-import { keymap } from "@codemirror/view";
-const languageExtensions = {
-    "javascript": javascript({ jsx: true }),
-    "python": python(),
-    "java": java()
-};
+import React, { useEffect, useRef } from "react";
+import Editor from '@monaco-editor/react';
 
-const Editor = ({ onChange, language, handleSave, code }) => {
-    // Handle the code editor change
-    const onCodeChange = React.useCallback((value, viewUpdate) => {
-        onChange(value, viewUpdate);
-    }, []);
+
+const MonacoEditor = ({ onChange, language, handleSave, code }) => {
+    const editorRef = useRef(null); // Reference to the editor instance
+    const handleEditorDidMount = (editor) => {
+        editorRef.current = editor;
+    };
+
+    useEffect(() => {
+        console.log("Code changed", code);
+        if (editorRef.current) {
+            const editor = editorRef.current;
+            editor.getModel().setValue(code); // Set the new code
+          }
+    }, [code]);
 
     return (
-        <div className="editor">
-            <CodeMirror
-                value={code}
-                height="100vh"
-                theme="light"
-                extensions={[
-                    languageExtensions[language?.toLowerCase() || "javascript"],
-                    keymap.of([
-                        {
-                            key: "Mod-s", // Mod is "Ctrl" on Windows and "Cmd" on Mac
-                            run: () => {
-                                handleSave();
-                                return true; // Prevent default behavior
-                            },
-                        },
-                    ])
-                ]}
-                onChange={onCodeChange}
-                style={{
-                    fontSize: '14px', // Change this to your desired font size
-                    fontFamily: "'Courier New', Courier, monospace", // Optional: Set a specific font family
-                }}
-            />
-
+        <div style={{ height: "90vh" }}>
+            <Editor
+                height="90vh"
+                defaultLanguage={language?.toLowerCase() || "javascript"}
+                defaultValue={code}
+                onChange={onChange}
+                onMount={handleEditorDidMount}
+                options={{
+                    fontSize: 14,
+                    minimap: { enabled: false },
+                  }}
+            />;
         </div>
     );
 };
 
-export default Editor;
+export default MonacoEditor;
+

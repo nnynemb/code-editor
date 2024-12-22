@@ -4,17 +4,19 @@
   "private": true,
   "dependencies": {
     "@apollo/client": "^3.12.2",
+    "@codemirror/basic-setup": "^0.20.0",
     "@codemirror/lang-java": "^6.0.1",
     "@codemirror/lang-javascript": "^6.2.2",
     "@codemirror/lang-python": "^6.1.6",
     "@codemirror/tooltip": "^0.19.16",
+    "@monaco-editor/react": "^4.6.0",
     "@popperjs/core": "^2.11.8",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
-    "@uiw/react-codemirror": "^4.23.6",
     "axios": "^1.7.8",
     "bootstrap": "^5.3.3",
+    "codemirror": "^6.0.1",
     "graphql": "^16.9.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
@@ -22,6 +24,7 @@
     "react-scripts": "5.0.1",
     "sass": "^1.81.0",
     "socket.io-client": "^4.8.1",
+    "uuid": "^11.0.3",
     "web-vitals": "^2.1.4"
   },
   "scripts": {

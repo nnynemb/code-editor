@@ -1,19 +1,32 @@
+import { Editor } from "@monaco-editor/react";
 import "./Output.scss";
-import CodeMirror from "@uiw/react-codemirror";
+import { useEffect, useRef } from "react";
 
 const Output = ({ output }) => {
-    const htmlContent = output.replace(/\n/g, "<br>");
+    const editorRef = useRef(null);
+    const handleEditorDidMount = (editor) => {
+        editorRef.current = editor;
+    };
+
+    useEffect(() => {
+        if (editorRef.current) {
+            const editor = editorRef.current;
+            editor.getModel().setValue(output);
+        }
+    }, [output]);
     return (
         <div className="output">
-            <CodeMirror
-                value={output}
+             <Editor 
+                height="90vh"
+                defaultLanguage="html"
+                defaultValue={output}
+                onMount={handleEditorDidMount}
                 options={{
-                    mode: 'text', // Use plain text mode
-                    lineNumbers: true, // Enable line numbers if needed
-                    readOnly: true, // Make it read-only
-                    theme: 'default', // Adjust theme as needed
+                    fontSize: 14,
+                    minimap: { enabled: false },
+                    readOnly: true
                 }}
-            />
+             />
         </div>
     );
 };
