@@ -85,14 +85,16 @@ export default function FullEditor() {
     },
   });
 
-  const onChange = (changedCode) => {
+  const onChange = (changedCode, cursorPosition) => {
     if (!sessionId || !sessionIdGenerated) return;
+    if (changedCode === code) return;
+    setCode(changedCode);
     const data = {
-      code: changedCode, language, username: username, 
+      code: changedCode, language, username, 
       userId: sessionIdGenerated,
       cursor: {
         content: `${username} is typing...`,
-        position: { line: 1, column: 1 }
+        position: cursorPosition
       }
     };
     // Emit with a callback for acknowledgment
@@ -120,10 +122,6 @@ export default function FullEditor() {
   };
 
   useEffect(() => {
-    console.log("cursors:", cursors);
-  }, [cursors]);
-
-  useEffect(() => {
     // Join the room directly after the connection is established
     socket && sessionId && socket.on('connect', () => {
       socket.emit('joinRoom', sessionId); // Join the room after connection
@@ -138,8 +136,8 @@ export default function FullEditor() {
       const cursor = data.cursor;
       const userId = data.userId;
       if (userId && sessionIdGenerated && channel === sessionId && senderSocketId !== socket.id && userId !== sessionIdGenerated) {
-        if (content) setCode(content);
-        if (remotelanguage) setLanguage(language);
+        if (content && content !== code) setCode(content);
+        if (remotelanguage && remotelanguage !== language) setLanguage(language);
         if (cursor) {
           setCursors((previousCursors) => {
             const newCursors = { ...previousCursors };
@@ -312,10 +310,7 @@ export default function FullEditor() {
       <div className="row g-0">
         <div className="col-8" ref={leftColumnRef}>
           <div className="editor-container">
-            <Editor onChange={onChange} handleSave={sendCodeToExecute} code={code} language={language} cursors={[
-              { content: 'User 1', line: 3, column: 5 },
-              { content: 'User 2', line: 6, column: 12 },
-            ]} />
+            <Editor onChange={onChange} handleSave={sendCodeToExecute} code={code} language={language} cursors={cursors} />
           </div>
         </div>
         <div className="col-4" ref={rightColumnRef}>
