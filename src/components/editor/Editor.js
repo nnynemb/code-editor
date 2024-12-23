@@ -6,6 +6,7 @@ const MonacoEditor = ({ onChange, language, code, cursors = [] }) => {
     const editorRef = useRef(null);
     const monacoRef = useRef(null);
     const [decorations, setDecorations] = useState([]); // For custom cursors
+    const [visibleTooltips, setVisibleTooltips] = useState({}); // Track which tooltips are visible
 
     const handleEditorDidMount = (editor, monaco) => {
         editorRef.current = editor;
@@ -68,6 +69,20 @@ const MonacoEditor = ({ onChange, language, code, cursors = [] }) => {
         // Apply the custom cursor decorations
         const decorations = editor.deltaDecorations([], newDecorations);
         setDecorations(decorations);
+
+        // Manage tooltips visibility
+        const updatedTooltips = {};
+        Object.keys(cursors).forEach((cursor) => {
+            updatedTooltips[cursor] = true; // Show tooltip
+            setTimeout(() => {
+                setVisibleTooltips((prev) => {
+                    const newTooltips = { ...prev };
+                    delete newTooltips[cursor];
+                    return newTooltips;
+                });
+            }, 2000); // Hide after 3 seconds
+        });
+        setVisibleTooltips(updatedTooltips);
     }, [cursors]);
 
     return (
@@ -90,7 +105,8 @@ const MonacoEditor = ({ onChange, language, code, cursors = [] }) => {
                 const position = calculateTooltipPosition(content);
                 const backgroundColor = generateConsistentColor(content.username);
                 return (
-                    position && (
+                    position &&
+                    visibleTooltips[cursor] && ( // Show tooltip only if it's visible
                         <div
                             key={index}
                             style={{
