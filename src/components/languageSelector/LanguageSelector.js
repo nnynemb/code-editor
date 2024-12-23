@@ -5,7 +5,7 @@ const languages = [
 const LanguageSelector = ({onLanguageSelect, language}) => {
     return (
         <div className="dropdown">
-            <button className="btn btn-dark dropdown-toggle" type="button" id="dropdownMenuButton2" data-bs-toggle="dropdown" aria-expanded="false">
+            <button className="btn btn-outline-dark dropdown-toggle" type="button" id="dropdownMenuButton2" data-bs-toggle="dropdown" aria-expanded="false">
                 {language.toLowerCase()}
             </button>
             <ul className="dropdown-menu dropdown-menu-dark" aria-labelledby="dropdownMenuButton2">

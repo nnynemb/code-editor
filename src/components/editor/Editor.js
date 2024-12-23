@@ -5,7 +5,6 @@ import { generateConsistentColor } from "../../utils/randomizer.util";
 const MonacoEditor = ({ onChange, language, code, cursors = [] }) => {
     const editorRef = useRef(null);
     const monacoRef = useRef(null);
-    const [decorations, setDecorations] = useState([]); // For custom cursors
     const [visibleTooltips, setVisibleTooltips] = useState({}); // Track which tooltips are visible
 
     const handleEditorDidMount = (editor, monaco) => {
@@ -48,39 +47,16 @@ const MonacoEditor = ({ onChange, language, code, cursors = [] }) => {
     };
 
     useEffect(() => {
-        if (!editorRef.current || !monacoRef.current) return;
-
-        const editor = editorRef.current;
-        const monaco = monacoRef.current;
-
-        // Update custom cursors
-        const newDecorations = Object.keys(cursors).map((cursor, index) => {
-            const content = cursors[cursor];
-            const position = content.position;
-            return {
-                range: new monaco.Range(position.lineNumber, position.column, position.lineNumber, position.column),
-                options: {
-                    className: "custom-cursor", // Custom class for styling the cursor
-                    hoverMessage: { value: content.username }, // Tooltip on hover
-                },
-            };
-        });
-
-        // Apply the custom cursor decorations
-        const decorations = editor.deltaDecorations([], newDecorations);
-        setDecorations(decorations);
-
-        // Manage tooltips visibility
         const updatedTooltips = {};
         Object.keys(cursors).forEach((cursor) => {
-            updatedTooltips[cursor] = true; // Show tooltip
+            updatedTooltips[cursor] = true; // Make tooltip visible
             setTimeout(() => {
                 setVisibleTooltips((prev) => {
                     const newTooltips = { ...prev };
-                    delete newTooltips[cursor];
+                    delete newTooltips[cursor]; // Hide tooltip after 3 seconds
                     return newTooltips;
                 });
-            }, 2000); // Hide after 3 seconds
+            }, 2000); // 3 seconds duration
         });
         setVisibleTooltips(updatedTooltips);
     }, [cursors]);
@@ -127,19 +103,6 @@ const MonacoEditor = ({ onChange, language, code, cursors = [] }) => {
                     )
                 );
             })}
-
-            {/* Custom cursor styling */}
-            <style>
-                {`
-                    .custom-cursor {
-                        position: relative;
-                        background-color: red;
-                        width: 2px;
-                        height: 1em;
-                        z-index: 1000;
-                    }
-                `}
-            </style>
         </div>
     );
 };

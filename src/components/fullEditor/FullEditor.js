@@ -90,7 +90,7 @@ export default function FullEditor() {
     if (changedCode === code) return;
     setCode(changedCode);
     const data = {
-      code: changedCode, language, username, 
+      code: changedCode, language, username,
       userId: sessionIdGenerated,
       cursor: {
         content: `${username} is typing...`,
@@ -124,7 +124,13 @@ export default function FullEditor() {
   useEffect(() => {
     // Join the room directly after the connection is established
     socket && sessionId && socket.on('connect', () => {
+      console.log('Socket connected');
       socket.emit('joinRoom', sessionId); // Join the room after connection
+    });
+
+    // on socket disconnect
+    socket && sessionId && socket.on('disconnect', () => {
+      console.log('Socket disconnected');
     });
 
     // get the code chnage events from the server
@@ -190,7 +196,7 @@ export default function FullEditor() {
         }
       }
     });
-    
+
 
     return () => {
       socket && sessionId && socket.off(sessionId);
@@ -199,7 +205,7 @@ export default function FullEditor() {
     };
 
   }, [socket, sessionId]);
-  
+
 
   // Execute the code
   async function executeCode(codeString, selectedLanguage) {
@@ -287,7 +293,7 @@ export default function FullEditor() {
                 </span>
               )}
             </button>
-            <button className="btn btn-success ms-2" type="button" disabled={saving} onClick={saveCodeToDatabase}>
+            <button className="btn btn-outline-success ms-2" type="button" disabled={saving} onClick={saveCodeToDatabase}>
               {saving ? (
                 <span>
                   <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Saving
@@ -296,10 +302,10 @@ export default function FullEditor() {
                 "Save"
               )}
             </button>
-            <button className="btn btn-danger ms-2" onClick={clearOutput} disabled={loading}>
+            <button className="btn btn-outline-danger ms-2" onClick={clearOutput} disabled={loading}>
               Clear output
             </button>
-            <button className="btn btn-info ms-2" onClick={shareSession}>
+            <button className="btn btn-outline-info ms-2" onClick={shareSession}>
               <i className="bi bi-share"></i> Share
             </button>
             <AskUsername modalRef={modalRef} saveUserData={saveUserData} isLoading={isSavingModalData} />
