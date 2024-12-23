@@ -115,10 +115,11 @@ const MonacoEditor = ({ onChange, language, code, cursors = [] }) => {
                                 left: position.left,
                                 backgroundColor: backgroundColor,
                                 color: "white",
-                                padding: "5px",
+                                padding: "3px",
                                 borderRadius: "4px",
-                                fontSize: "12px",
+                                fontSize: "14px",
                                 zIndex: 10,
+                                fontWeight: "bold",
                             }}
                         >
                             {position.tooltip}
