@@ -284,6 +284,8 @@ export default function FullEditor() {
               onErase={clearOutput}
               onShare={shareSession}
               setSelectedLanguage={setLanguage}
+              executing={loading}
+              saving={saving}
               code={code}
               language={language}
               cursors={cursors} />

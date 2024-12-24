@@ -5,7 +5,7 @@ import { generateConsistentColor } from "../../utils/randomizer.util";
 
 const MonacoEditorWithSidebarAndHeader = ({
     onChange,
-    language="javascript",
+    language = "javascript",
     code,
     cursors = [],
     onRun,
@@ -13,6 +13,8 @@ const MonacoEditorWithSidebarAndHeader = ({
     onShare,
     onErase,
     setSelectedLanguage,
+    executing = false,
+    saving = false,
 }) => {
     const editorRef = useRef(null);
     const monacoRef = useRef(null);
@@ -91,14 +93,57 @@ const MonacoEditorWithSidebarAndHeader = ({
 
                 {/* Header Actions with Titles */}
                 <div style={{ display: "flex", gap: "20px" }}>
-                    <div onClick={onRun} style={{ display: "flex", alignItems: "center", cursor: "pointer" }}>
-                        <FaPlay size={20} title="Run Code" />
+                    <div
+                        onClick={onRun}
+                        style={{
+                            display: "flex",
+                            alignItems: "center",
+                            cursor: executing ? "not-allowed" : "pointer",
+                            opacity: executing ? 0.5 : 1,
+                            transition: "all 0.3s",
+                        }}
+                    >
+                        <FaPlay
+                            size={20}
+                            title="Run Code"
+                            style={{
+                                borderRadius: "50%",
+                                backgroundColor: executing ? "#ccc" : "#4CAF50", // Green while active, gray while inactive
+                                padding: "5px",
+                                transition: "background-color 0.3s, transform 0.3s",
+                                transform: executing ? "rotate(360deg)" : "none", // Rotating icon when executing
+                            }}
+                        />
                         <span style={{ marginLeft: "5px", fontSize: "14px" }}>Run</span>
                     </div>
-                    <div onClick={onSave} style={{ display: "flex", alignItems: "center", cursor: "pointer" }}>
-                        <FaSave size={20} title="Save Code" />
+                    <div
+                        onClick={() => {
+                            if (!saving) {
+                                onSave(); // Only trigger save if not executing
+                            }
+                        }}
+                        style={{
+                            display: "flex",
+                            alignItems: "center",
+                            cursor: saving ? "not-allowed" : "pointer",
+                            opacity: saving ? 0.5 : 1,
+                            transition: "all 0.3s",
+                        }}
+                    >
+                        <FaSave
+                            size={20}
+                            title="Save Code"
+                            style={{
+                                borderRadius: "50%",
+                                backgroundColor: saving ? "#ccc" : "#4CAF50", // Green while active, gray while inactive
+                                padding: "5px",
+                                transition: "background-color 0.3s, transform 0.3s",
+                                transform: saving ? "rotate(360deg)" : "none", // Rotating icon when executing
+                            }}
+                        />
                         <span style={{ marginLeft: "5px", fontSize: "14px" }}>Save</span>
                     </div>
+
                     <div onClick={onErase} style={{ display: "flex", alignItems: "center", cursor: "pointer" }}>
                         <FaEraser size={20} title="Erase Code" />
                         <span style={{ marginLeft: "5px", fontSize: "14px" }}>Erase</span>
