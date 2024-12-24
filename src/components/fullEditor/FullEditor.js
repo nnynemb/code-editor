@@ -45,7 +45,7 @@ export default function FullEditor() {
 
   const leftColumnRef = useRef();
   const rightColumnRef = useRef();
-  const modalRef = useRef();
+  // const modalRef = useRef();
   const modalInstanceRef = useRef(null); // Ref for the modal instance
   const socket = useSocket();
 
@@ -66,6 +66,7 @@ export default function FullEditor() {
   //     }
   //   }, 500);
   // }, []);
+  
 
   // GraphQL hooks
   const { data, loading: loadingSession, error: sessionError } = useQuery(GET_SESSION, {

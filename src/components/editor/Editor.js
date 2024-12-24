@@ -134,7 +134,7 @@ const MonacoEditorWithSidebarAndHeader = ({
                         style={{
                             margin: "20px 0",
                             cursor: "pointer",
-                            color: language === "javascript" ? "#4CAF50" : "white",
+                            color: language?.toLowerCase() === "javascript" ? "#4CAF50" : "white",
                         }}
                     >
                         <FaJs size={20} title="JavaScript" />
@@ -144,7 +144,7 @@ const MonacoEditorWithSidebarAndHeader = ({
                         style={{
                             margin: "20px 0",
                             cursor: "pointer",
-                            color: language === "python" ? "#4CAF50" : "white",
+                            color: language?.toLowerCase() === "python" ? "#4CAF50" : "white",
                         }}
                     >
                         <FaPython size={20} title="Python" />
@@ -155,7 +155,7 @@ const MonacoEditorWithSidebarAndHeader = ({
                 <div style={{ flexGrow: 1, position: "relative" }}>
                     <Editor
                         height="100%"
-                        defaultLanguage={language || "javascript"}
+                        defaultLanguage={language?.toLowerCase() || "javascript"}
                         value={code}
                         onChange={onCodeChanged}
                         onMount={handleEditorDidMount}
