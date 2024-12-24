@@ -88,9 +88,9 @@ export default function FullEditor() {
   const onChange = (changedCode, cursorPosition) => {
     if (!sessionId || !sessionIdGenerated) return;
     if (changedCode === code) return;
-    setCode(changedCode);
+    setCode(changedCode || "");
     const data = {
-      code: changedCode, language, username,
+      code: changedCode || "", language, username,
       userId: sessionIdGenerated,
       cursor: {
         content: `${username} is typing...`,
@@ -142,8 +142,9 @@ export default function FullEditor() {
       const cursor = data.cursor;
       const userId = data.userId;
       if (userId && sessionIdGenerated && channel === sessionId && senderSocketId !== socket.id && userId !== sessionIdGenerated) {
-        if (content && content !== code) setCode(content);
-        if (remotelanguage && remotelanguage !== language) setLanguage(language);
+        // Update the code only if it is different from the current code or empty
+        if (content !== code || content === "") setCode(content);
+        if (remotelanguage !== language) setLanguage(language);
         if (cursor) {
           setCursors((previousCursors) => {
             const newCursors = { ...previousCursors };

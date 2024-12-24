@@ -12,13 +12,6 @@ const MonacoEditor = ({ onChange, language, code, cursors = [] }) => {
         monacoRef.current = monaco;
     };
 
-    useEffect(() => {
-        if (editorRef.current && code && code !== editorRef.current.getValue()) {
-            const editor = editorRef.current;
-            editor.setValue(code); // Update code
-        }
-    }, [code]);
-
     const onCodeChanged = (changedCode) => {
         const editor = editorRef.current;
         const position = editor.getPosition();
