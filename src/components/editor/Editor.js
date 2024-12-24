@@ -1,8 +1,19 @@
 import React, { useEffect, useRef, useState } from "react";
 import Editor from "@monaco-editor/react";
+import { FaPlay, FaSave, FaEraser, FaShare, FaCog, FaCode, FaJs, FaPython } from "react-icons/fa"; // Example icons from React Icons
 import { generateConsistentColor } from "../../utils/randomizer.util";
 
-const MonacoEditor = ({ onChange, language, code, cursors = [] }) => {
+const MonacoEditorWithSidebarAndHeader = ({
+    onChange,
+    language="javascript",
+    code,
+    cursors = [],
+    onRun,
+    onSave,
+    onShare,
+    onErase,
+    setSelectedLanguage,
+}) => {
     const editorRef = useRef(null);
     const monacoRef = useRef(null);
     const [visibleTooltips, setVisibleTooltips] = useState({}); // Track which tooltips are visible
@@ -10,6 +21,7 @@ const MonacoEditor = ({ onChange, language, code, cursors = [] }) => {
     const handleEditorDidMount = (editor, monaco) => {
         editorRef.current = editor;
         monacoRef.current = monaco;
+        monaco.editor.setTheme("vs-dark");
     };
 
     const onCodeChanged = (changedCode) => {
@@ -54,50 +66,137 @@ const MonacoEditor = ({ onChange, language, code, cursors = [] }) => {
         setVisibleTooltips(updatedTooltips);
     }, [cursors]);
 
-    return (
-        <div style={{ position: "relative", height: "90vh" }}>
-            <Editor
-                height="90vh"
-                defaultLanguage={language?.toLowerCase() || "javascript"}
-                value={code}
-                onChange={onCodeChanged}
-                onMount={handleEditorDidMount}
-                options={{
-                    fontSize: 14,
-                    minimap: { enabled: false },
-                }}
-            />
+    const handleLanguageSelect = (language) => {
+        setSelectedLanguage(language);
+    };
 
-            {/* Tooltips */}
-            {Object.keys(cursors).map((cursor, index) => {
-                const content = cursors[cursor];
-                const position = calculateTooltipPosition(content);
-                const backgroundColor = generateConsistentColor(content.username);
-                return (
-                    position &&
-                    visibleTooltips[cursor] && ( // Show tooltip only if it's visible
-                        <div
-                            key={index}
-                            style={{
-                                position: "absolute",
-                                top: position.top,
-                                left: position.left,
-                                backgroundColor: backgroundColor,
-                                color: "white",
-                                padding: "3px",
-                                borderRadius: "4px",
-                                fontSize: "14px",
-                                zIndex: 10,
-                                fontWeight: "bold",
-                            }}
-                        >
-                            {position.tooltip}
-                        </div>
-                    )
-                );
-            })}
+    return (
+        <div style={{ height: "100vh", display: "flex", flexDirection: "column" }}>
+            {/* Header */}
+            <div
+                style={{
+                    backgroundColor: "#282c34",
+                    color: "white",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    padding: "10px 20px",
+                }}
+            >
+                {/* Header Title */}
+                <div style={{ display: "flex", alignItems: "center" }}>
+                    <FaCode size={20} style={{ marginRight: "10px" }} />
+                    <span style={{ fontSize: "18px", fontWeight: "bold" }}>Nnynemb Editor</span>
+                </div>
+
+                {/* Header Actions with Titles */}
+                <div style={{ display: "flex", gap: "20px" }}>
+                    <div onClick={onRun} style={{ display: "flex", alignItems: "center", cursor: "pointer" }}>
+                        <FaPlay size={20} title="Run Code" />
+                        <span style={{ marginLeft: "5px", fontSize: "14px" }}>Run</span>
+                    </div>
+                    <div onClick={onSave} style={{ display: "flex", alignItems: "center", cursor: "pointer" }}>
+                        <FaSave size={20} title="Save Code" />
+                        <span style={{ marginLeft: "5px", fontSize: "14px" }}>Save</span>
+                    </div>
+                    <div onClick={onErase} style={{ display: "flex", alignItems: "center", cursor: "pointer" }}>
+                        <FaEraser size={20} title="Erase Code" />
+                        <span style={{ marginLeft: "5px", fontSize: "14px" }}>Erase</span>
+                    </div>
+                    <div onClick={onShare} style={{ display: "flex", alignItems: "center", cursor: "pointer" }}>
+                        <FaShare size={20} title="Share Code" />
+                        <span style={{ marginLeft: "5px", fontSize: "14px" }}>Share</span>
+                    </div>
+                    <div style={{ display: "flex", alignItems: "center", cursor: "pointer" }}>
+                        <FaCog size={20} title="Settings" />
+                        <span style={{ marginLeft: "5px", fontSize: "14px" }}>Settings</span>
+                    </div>
+                </div>
+            </div>
+
+            {/* Main Content */}
+            <div style={{ flexGrow: 1, display: "flex" }}>
+                {/* Sidebar */}
+                <div
+                    style={{
+                        width: "50px",
+                        backgroundColor: "#333",
+                        color: "white",
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        padding: "10px 0",
+                    }}
+                >
+                    {/* Language Selection */}
+                    <div
+                        onClick={() => handleLanguageSelect("javascript")}
+                        style={{
+                            margin: "20px 0",
+                            cursor: "pointer",
+                            color: language === "javascript" ? "#4CAF50" : "white",
+                        }}
+                    >
+                        <FaJs size={20} title="JavaScript" />
+                    </div>
+                    <div
+                        onClick={() => handleLanguageSelect("python")}
+                        style={{
+                            margin: "20px 0",
+                            cursor: "pointer",
+                            color: language === "python" ? "#4CAF50" : "white",
+                        }}
+                    >
+                        <FaPython size={20} title="Python" />
+                    </div>
+                </div>
+
+                {/* Monaco Editor */}
+                <div style={{ flexGrow: 1, position: "relative" }}>
+                    <Editor
+                        height="100%"
+                        defaultLanguage={language || "javascript"}
+                        value={code}
+                        onChange={onCodeChanged}
+                        onMount={handleEditorDidMount}
+                        options={{
+                            fontSize: 14,
+                            minimap: { enabled: false },
+                        }}
+                    />
+
+                    {/* Tooltips */}
+                    {Object.keys(cursors).map((cursor, index) => {
+                        const content = cursors[cursor];
+                        const position = calculateTooltipPosition(content);
+                        const backgroundColor = generateConsistentColor(content.username);
+                        return (
+                            position &&
+                            visibleTooltips[cursor] && ( // Show tooltip only if it's visible
+                                <div
+                                    key={index}
+                                    style={{
+                                        position: "absolute",
+                                        top: position.top,
+                                        left: position.left,
+                                        backgroundColor: backgroundColor,
+                                        color: "white",
+                                        padding: "3px",
+                                        borderRadius: "4px",
+                                        fontSize: "14px",
+                                        zIndex: 10,
+                                        fontWeight: "bold",
+                                    }}
+                                >
+                                    {position.tooltip}
+                                </div>
+                            )
+                        );
+                    })}
+                </div>
+            </div>
         </div>
     );
 };
 
-export default MonacoEditor;
+export default MonacoEditorWithSidebarAndHeader;

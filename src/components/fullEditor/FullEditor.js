@@ -3,12 +3,10 @@ import { useParams } from "react-router-dom";
 import { gql, useMutation, useQuery } from "@apollo/client";
 import Editor from "../editor/Editor";
 import Output from "../output/Output";
-import LanguageSelector from "../languageSelector/LanguageSelector";
 import compilerService from "./../../services/api";
 import "./FullEditor.scss";  // Import the SCSS
 import { useSocket } from "./../../context/Socket.IO.Context";
 import AskUsername from "../askUsername/AskUsername";
-import * as bootstrap from "bootstrap";
 import { generateCartoonHeroName } from "../../utils/randomizer.util";
 import { v4 as uuidv4 } from 'uuid';
 
@@ -103,10 +101,6 @@ export default function FullEditor() {
 
   const sendCodeToExecute = () => {
     executeCode(code, language);
-  };
-
-  const onLanguageSelect = (selectedLanguage) => {
-    setLanguage(selectedLanguage);
   };
 
   const clearOutput = () => {
@@ -279,45 +273,19 @@ export default function FullEditor() {
 
   return (
     <div className="full-editor">
-      <nav className="navbar navbar-expand-lg">
-        <div className="container-fluid">
-          <LanguageSelector onLanguageSelect={onLanguageSelect} language={language} />
-          <div className="d-flex">
-            <button className="btn btn-primary" type="button" disabled={loading} onClick={sendCodeToExecute}>
-              {loading ? (
-                <span>
-                  <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Running
-                </span>
-              ) : (
-                <span>
-                  <i className="bi bi-play-fill"></i> Run
-                </span>
-              )}
-            </button>
-            <button className="btn btn-outline-success ms-2" type="button" disabled={saving} onClick={saveCodeToDatabase}>
-              {saving ? (
-                <span>
-                  <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Saving
-                </span>
-              ) : (
-                "Save"
-              )}
-            </button>
-            <button className="btn btn-outline-danger ms-2" onClick={clearOutput} disabled={loading}>
-              Clear output
-            </button>
-            <button className="btn btn-outline-info ms-2" onClick={shareSession}>
-              <i className="bi bi-share"></i> Share
-            </button>
-            <AskUsername modalRef={modalRef} saveUserData={saveUserData} isLoading={isSavingModalData} />
-          </div>
-        </div>
-      </nav>
-
       <div className="row g-0">
         <div className="col-8" ref={leftColumnRef}>
           <div className="editor-container">
-            <Editor onChange={onChange} handleSave={sendCodeToExecute} code={code} language={language} cursors={cursors} />
+            <Editor onChange={onChange}
+              handleSave={sendCodeToExecute}
+              onRun={sendCodeToExecute}
+              onSave={saveCodeToDatabase}
+              onErase={clearOutput}
+              onShare={shareSession}
+              setSelectedLanguage={setLanguage}
+              code={code}
+              language={language}
+              cursors={cursors} />
           </div>
         </div>
         <div className="col-4" ref={rightColumnRef}>
