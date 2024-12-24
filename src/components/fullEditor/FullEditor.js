@@ -128,6 +128,11 @@ export default function FullEditor() {
       console.log('Socket disconnected');
     });
 
+    if(socket && sessionId && socket.connected) {
+      console.log('Socket connected');
+      socket.emit('joinRoom', sessionId); // Join the room after
+    }
+
     // get the code chnage events from the server
     socket && sessionId && socket.on(sessionId, (data) => {
       const channel = data.channel;
@@ -200,7 +205,7 @@ export default function FullEditor() {
       socket && sessionId && socket.off('command');
     };
 
-  }, [socket, sessionId]);
+  }, [socket, sessionId, sessionIdGenerated, code, language]);
 
 
   // Execute the code
