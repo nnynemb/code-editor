@@ -180,37 +180,48 @@ const MonacoEditorWithSidebarAndHeader = ({
                 {/* Sidebar */}
                 <div
                     style={{
-                        width: "50px",
-                        backgroundColor: "#333",
+                        width: "50px",  // Reduced width
+                        backgroundColor: "#2C3E50", // Dark background
                         color: "white",
                         display: "flex",
                         flexDirection: "column",
                         alignItems: "center",
                         padding: "10px 0",
+                        boxShadow: "2px 0 5px rgba(0, 0, 0, 0.3)",
                     }}
                 >
-                    {/* Language Selection */}
-                    <div
-                        onClick={() => handleLanguageSelect("javascript")}
-                        style={{
-                            margin: "20px 0",
-                            cursor: "pointer",
-                            color: language?.toLowerCase() === "javascript" ? "#4CAF50" : "white",
-                        }}
-                    >
-                        <FaJs size={20} title="JavaScript" />
-                    </div>
-                    <div
-                        onClick={() => handleLanguageSelect("python")}
-                        style={{
-                            margin: "20px 0",
-                            cursor: "pointer",
-                            color: language?.toLowerCase() === "python" ? "#4CAF50" : "white",
-                        }}
-                    >
-                        <FaPython size={20} title="Python" />
-                    </div>
+                    {[
+                        { lang: "python", Icon: FaPython },
+                        { lang: "javascript", Icon: FaJs },
+                    ].map(({ lang, Icon }, index) => (
+                        <div
+                            key={index}
+                            onClick={() => handleLanguageSelect(lang)}
+                            style={{
+                                width: "40px",  // Reduced icon width
+                                height: "40px", // Reduced icon height
+                                margin: "10px 0",
+                                backgroundColor: language?.toLowerCase() === lang ? "#007BFF" : "transparent", // Blue for active, transparent otherwise
+                                borderRadius: "10px",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                cursor: "pointer",
+                                boxShadow: language?.toLowerCase() === lang ? "0px 4px 6px rgba(0, 123, 255, 0.5)" : "none", // Add shadow for active icon
+                                transition: "background-color 0.3s, box-shadow 0.3s",
+                            }}
+                        >
+                            <Icon
+                                size={24}  // Reduced icon size
+                                style={{
+                                    color: language?.toLowerCase() === lang ? "white" : "gray", // White for active, gray otherwise
+                                    transition: "color 0.3s",
+                                }}
+                            />
+                        </div>
+                    ))}
                 </div>
+
 
                 {/* Monaco Editor */}
                 <div style={{ flexGrow: 1, position: "relative" }}>

@@ -9,6 +9,7 @@ import { useSocket } from "./../../context/Socket.IO.Context";
 import AskUsername from "../askUsername/AskUsername";
 import { generateCartoonHeroName } from "../../utils/randomizer.util";
 import { v4 as uuidv4 } from 'uuid';
+import { debounce } from "lodash";
 
 // GraphQL Queries and Mutations
 const GET_SESSION = gql`
@@ -67,7 +68,7 @@ export default function FullEditor() {
   //     }
   //   }, 500);
   // }, []);
-  
+
 
   // GraphQL hooks
   const { data, loading: loadingSession, error: sessionError } = useQuery(GET_SESSION, {
@@ -85,10 +86,7 @@ export default function FullEditor() {
     },
   });
 
-  const onChange = (changedCode, cursorPosition) => {
-    if (!sessionId || !sessionIdGenerated) return;
-    if (changedCode === code) return;
-    setCode(changedCode || "");
+  const streamCode = debounce((changedCode, language, username, sessionIdGenerated, cursorPosition) => {
     const data = {
       code: changedCode || "", language, username,
       userId: sessionIdGenerated,
@@ -99,7 +97,16 @@ export default function FullEditor() {
     };
     // Emit with a callback for acknowledgment
     socket.emit(sessionId, data);
+  }, 1000); // Debounce the function to avoid sending too many events
+
+  const onChange = (changedCode, cursorPosition) => {
+    if (!sessionId || !sessionIdGenerated) return;
+    if (changedCode === code) return;
+    setCode(changedCode || "");
+    streamCode(changedCode, language, username, sessionIdGenerated, cursorPosition);
   };
+
+
 
   const sendCodeToExecute = () => {
     executeCode(code, language);
@@ -132,7 +139,7 @@ export default function FullEditor() {
       socket.emit('joinRoom', sessionId); // Join the room after connection
     });
 
-    if(socket && sessionId && socket.connected) {
+    if (socket && sessionId && socket.connected) {
       setIsSocketConnected(true);
       socket.emit('joinRoom', sessionId); // Join the room after
     }
@@ -298,8 +305,8 @@ export default function FullEditor() {
               saving={saving}
               code={code}
               language={language}
-              cursors={cursors} 
-              isSocketConnected={isSocketConnected}/>
+              cursors={cursors}
+              isSocketConnected={isSocketConnected} />
           </div>
         </div>
         <div className="col-4" ref={rightColumnRef}>
