@@ -106,7 +106,11 @@ const MonacoEditorWithSidebarAndHeader = ({
                 {/* Header Actions with Titles */}
                 <div style={{ display: "flex", gap: "20px" }}>
                     <div
-                        onClick={onRun}
+                        onClick={() => {
+                            if (!executing) {
+                                onRun();
+                            }
+                        }}
                         style={{
                             display: "flex",
                             alignItems: "center",

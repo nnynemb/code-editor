@@ -119,11 +119,9 @@ export default function FullEditor() {
 
   useEffect(() => {
     socket && socket.on('connect', () => {
-      console.log('Socket connected');
       setIsSocketConnected(true);
     });
     socket && socket.on('disconnect', () => {
-      console.log('Socket disconnected');
       setIsSocketConnected(false);
     });
   }, [socket]);
@@ -131,17 +129,11 @@ export default function FullEditor() {
   useEffect(() => {
     // Join the room directly after the connection is established
     socket && sessionId && socket.on('connect', () => {
-      console.log('Socket connected');
       socket.emit('joinRoom', sessionId); // Join the room after connection
     });
 
-    // on socket disconnect
-    socket && sessionId && socket.on('disconnect', () => {
-      console.log('Socket disconnected');
-    });
-
     if(socket && sessionId && socket.connected) {
-      console.log('Socket connected');
+      setIsSocketConnected(true);
       socket.emit('joinRoom', sessionId); // Join the room after
     }
 
