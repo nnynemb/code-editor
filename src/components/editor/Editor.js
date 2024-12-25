@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import Editor from "@monaco-editor/react";
-import { FaPlay, FaSave, FaEraser, FaShare, FaCog, FaCode, FaJs, FaPython } from "react-icons/fa"; // Example icons from React Icons
+import { FaPlay, FaSave, FaEraser, FaShare, FaCode, FaJs, FaPython } from "react-icons/fa"; // Example icons from React Icons
 import { generateConsistentColor } from "../../utils/randomizer.util";
 
 const MonacoEditorWithSidebarAndHeader = ({
@@ -108,13 +108,13 @@ const MonacoEditorWithSidebarAndHeader = ({
                             title="Run Code"
                             style={{
                                 borderRadius: "50%",
-                                backgroundColor: executing ? "#ccc" : "#4CAF50", // Green while active, gray while inactive
+                                backgroundColor: executing ? "#ccc" : "#4CAF50", // Gray while executing, green otherwise
                                 padding: "5px",
-                                transition: "background-color 0.3s, transform 0.3s",
-                                transform: executing ? "rotate(360deg)" : "none", // Rotating icon when executing
+                                transition: "background-color 0.3s",
+                                animation: executing ? "spin 1s linear infinite" : "none", // Continuous rotation
                             }}
                         />
-                        <span style={{ marginLeft: "5px", fontSize: "14px" }}>Run</span>
+                        <span style={{ marginLeft: "5px", fontSize: "14px" }}>{executing ? 'Running' : 'Run'}</span>
                     </div>
                     <div
                         onClick={() => {
@@ -135,13 +135,13 @@ const MonacoEditorWithSidebarAndHeader = ({
                             title="Save Code"
                             style={{
                                 borderRadius: "50%",
-                                backgroundColor: saving ? "#ccc" : "#4CAF50", // Green while active, gray while inactive
+                                backgroundColor: saving ? "#ccc" : "#4CAF50", // Gray while saving, green otherwise
                                 padding: "5px",
-                                transition: "background-color 0.3s, transform 0.3s",
-                                transform: saving ? "rotate(360deg)" : "none", // Rotating icon when executing
+                                transition: "background-color 0.3s",
+                                animation: saving ? "spin 1s linear infinite" : "none", // Continuous rotation
                             }}
                         />
-                        <span style={{ marginLeft: "5px", fontSize: "14px" }}>Save</span>
+                        <span style={{ marginLeft: "5px", fontSize: "14px" }}>{saving ? 'Save' : 'Saving'}</span>
                     </div>
 
                     <div onClick={onErase} style={{ display: "flex", alignItems: "center", cursor: "pointer" }}>
@@ -151,10 +151,6 @@ const MonacoEditorWithSidebarAndHeader = ({
                     <div onClick={onShare} style={{ display: "flex", alignItems: "center", cursor: "pointer" }}>
                         <FaShare size={20} title="Share Code" />
                         <span style={{ marginLeft: "5px", fontSize: "14px" }}>Share</span>
-                    </div>
-                    <div style={{ display: "flex", alignItems: "center", cursor: "pointer" }}>
-                        <FaCog size={20} title="Settings" />
-                        <span style={{ marginLeft: "5px", fontSize: "14px" }}>Settings</span>
                     </div>
                 </div>
             </div>

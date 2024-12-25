@@ -161,21 +161,7 @@ export default function FullEditor() {
       const { output, sessionId: sid } = data;
 
       if (sid === sessionId) {
-        setOutput((previousOutput) => {
-          // Trim the previous output
-          const trimmedOutput = previousOutput.trimEnd();
-
-          // Split the new output by newline, filter out empty lines, and join them back
-          const numberedOutput = output
-            .split('\n') // Split the output into lines
-            .filter((line) => line.trim() !== '') // Omit empty lines
-            .join('\n'); // Join the lines back with newline characters
-
-          // Combine with the previous output
-          return trimmedOutput
-            ? `${trimmedOutput}\n${numberedOutput}`
-            : numberedOutput;
-        });
+        setOutputText(output);
       }
     });
 
@@ -208,16 +194,31 @@ export default function FullEditor() {
   }, [socket, sessionId, sessionIdGenerated, code, language]);
 
 
+  function setOutputText(output) {
+    setOutput((previousOutput) => {
+      // Trim the previous output
+      const trimmedOutput = previousOutput.trimEnd();
+
+      // Split the new output by newline, filter out empty lines, and join them back
+      const numberedOutput = output
+        .split('\n') // Split the output into lines
+        .filter((line) => line.trim() !== '') // Omit empty lines
+        .join('\n'); // Join the lines back with newline characters
+
+      // Combine with the previous output
+      return trimmedOutput
+        ? `${trimmedOutput}\n${numberedOutput}`
+        : numberedOutput;
+    });
+  }
+
   // Execute the code
   async function executeCode(codeString, selectedLanguage) {
     if (codeString && selectedLanguage && sessionId) {
       setLoading(true);
       const response = await compilerService.runCode({ code: codeString, language: selectedLanguage?.toLowerCase(), sessionId });
       const text = await response.text();
-      setOutput((previousOutput) => {
-        const trimmedOutput = previousOutput.trimEnd();
-        return trimmedOutput ? `${trimmedOutput}\n${text}` : text;
-      });
+      setOutputText(text);
     }
   }
 
