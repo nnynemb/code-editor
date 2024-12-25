@@ -8,7 +8,9 @@ export const SocketProvider = ({ children }) => {
   const [socket, setSocket] = useState(null);
 
   useEffect(() => {
-    const newSocket = io(SOCKET_SERVER_URL);
+    const newSocket = io(SOCKET_SERVER_URL, {
+      autoConnect: true,
+    });
     setSocket(newSocket);
     return () => newSocket.disconnect();
   }, []);

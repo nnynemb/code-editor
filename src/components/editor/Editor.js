@@ -15,10 +15,11 @@ const MonacoEditorWithSidebarAndHeader = ({
     setSelectedLanguage,
     executing = false,
     saving = false,
+    isSocketConnected, // Connection status from props
 }) => {
     const editorRef = useRef(null);
     const monacoRef = useRef(null);
-    const [visibleTooltips, setVisibleTooltips] = useState({}); // Track which tooltips are visible
+    const [visibleTooltips, setVisibleTooltips] = useState({});
 
     const handleEditorDidMount = (editor, monaco) => {
         editorRef.current = editor;
@@ -46,7 +47,7 @@ const MonacoEditorWithSidebarAndHeader = ({
         if (domNode && cursorCoords) {
             return {
                 top: cursorCoords.top + domNode.offsetTop,
-                left: cursorCoords.left + domNode.offsetLeft + 10, // Offset tooltip slightly
+                left: cursorCoords.left + domNode.offsetLeft + 10,
                 tooltip: username,
             };
         }
@@ -56,14 +57,14 @@ const MonacoEditorWithSidebarAndHeader = ({
     useEffect(() => {
         const updatedTooltips = {};
         Object.keys(cursors).forEach((cursor) => {
-            updatedTooltips[cursor] = true; // Make tooltip visible
+            updatedTooltips[cursor] = true;
             setTimeout(() => {
                 setVisibleTooltips((prev) => {
                     const newTooltips = { ...prev };
-                    delete newTooltips[cursor]; // Hide tooltip after 3 seconds
+                    delete newTooltips[cursor];
                     return newTooltips;
                 });
-            }, 2000); // 3 seconds duration
+            }, 2000);
         });
         setVisibleTooltips(updatedTooltips);
     }, [cursors]);
@@ -91,6 +92,17 @@ const MonacoEditorWithSidebarAndHeader = ({
                     <span style={{ fontSize: "18px", fontWeight: "bold" }}>Nnynemb Editor</span>
                 </div>
 
+                {/* Connection Status */}
+                <div
+                    style={{
+                        color: isSocketConnected ? "#4CAF50" : "#FF4C4C", // Green for connected, red for disconnected
+                        fontWeight: "bold",
+                        fontSize: "14px",
+                    }}
+                >
+                    {isSocketConnected ? "Connected to server" : "Disconnected"}
+                </div>
+
                 {/* Header Actions with Titles */}
                 <div style={{ display: "flex", gap: "20px" }}>
                     <div
@@ -108,18 +120,20 @@ const MonacoEditorWithSidebarAndHeader = ({
                             title="Run Code"
                             style={{
                                 borderRadius: "50%",
-                                backgroundColor: executing ? "#ccc" : "#4CAF50", // Gray while executing, green otherwise
+                                backgroundColor: executing ? "#ccc" : "#4CAF50",
                                 padding: "5px",
                                 transition: "background-color 0.3s",
-                                animation: executing ? "spin 1s linear infinite" : "none", // Continuous rotation
+                                animation: executing ? "spin 1s linear infinite" : "none",
                             }}
                         />
-                        <span style={{ marginLeft: "5px", fontSize: "14px" }}>{executing ? 'Running' : 'Run'}</span>
+                        <span style={{ marginLeft: "5px", fontSize: "14px" }}>
+                            Run
+                        </span>
                     </div>
                     <div
                         onClick={() => {
                             if (!saving) {
-                                onSave(); // Only trigger save if not executing
+                                onSave();
                             }
                         }}
                         style={{
@@ -135,13 +149,15 @@ const MonacoEditorWithSidebarAndHeader = ({
                             title="Save Code"
                             style={{
                                 borderRadius: "50%",
-                                backgroundColor: saving ? "#ccc" : "#4CAF50", // Gray while saving, green otherwise
+                                backgroundColor: saving ? "#ccc" : "#4CAF50",
                                 padding: "5px",
                                 transition: "background-color 0.3s",
-                                animation: saving ? "spin 1s linear infinite" : "none", // Continuous rotation
+                                animation: saving ? "spin 1s linear infinite" : "none",
                             }}
                         />
-                        <span style={{ marginLeft: "5px", fontSize: "14px" }}>{saving ? 'Save' : 'Saving'}</span>
+                        <span style={{ marginLeft: "5px", fontSize: "14px" }}>
+                            Save
+                        </span>
                     </div>
 
                     <div onClick={onErase} style={{ display: "flex", alignItems: "center", cursor: "pointer" }}>
@@ -213,7 +229,7 @@ const MonacoEditorWithSidebarAndHeader = ({
                         const backgroundColor = generateConsistentColor(content.username);
                         return (
                             position &&
-                            visibleTooltips[cursor] && ( // Show tooltip only if it's visible
+                            visibleTooltips[cursor] && (
                                 <div
                                     key={index}
                                     style={{

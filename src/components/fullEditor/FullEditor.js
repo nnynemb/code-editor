@@ -42,6 +42,7 @@ export default function FullEditor() {
   const [dividerPosition, setDividerPosition] = useState(50); // percentage of column width for divider
   const [isSavingModalData, setIsSavingModalData] = useState(false);
   const [cursors, setCursors] = useState({});
+  const [isSocketConnected, setIsSocketConnected] = useState(false);
 
   const leftColumnRef = useRef();
   const rightColumnRef = useRef();
@@ -115,6 +116,17 @@ export default function FullEditor() {
       });
     }
   };
+
+  useEffect(() => {
+    socket && socket.on('connect', () => {
+      console.log('Socket connected');
+      setIsSocketConnected(true);
+    });
+    socket && socket.on('disconnect', () => {
+      console.log('Socket disconnected');
+      setIsSocketConnected(false);
+    });
+  }, [socket]);
 
   useEffect(() => {
     // Join the room directly after the connection is established
@@ -294,7 +306,8 @@ export default function FullEditor() {
               saving={saving}
               code={code}
               language={language}
-              cursors={cursors} />
+              cursors={cursors} 
+              isSocketConnected={isSocketConnected}/>
           </div>
         </div>
         <div className="col-4" ref={rightColumnRef}>
