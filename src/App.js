@@ -5,8 +5,6 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Home from "./components/home/Home";
 import { SocketProvider } from "./context/Socket.IO.Context";
 import 'bootstrap/dist/css/bootstrap.min.css';
-import Login from "./components/login/Login";
-import Signup from "./components/signup/Signup";
 
 function App() {
 
@@ -16,8 +14,6 @@ function App() {
         <Routes>
           {/* Static Route */}
           <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
           {/* Dynamic Route */}
           <Route path="/editor/:sessionId" element={<FullEditor />} />
         </Routes>

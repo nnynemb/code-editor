@@ -6,7 +6,6 @@ import Output from "../output/Output";
 import compilerService from "./../../services/api";
 import "./FullEditor.scss";  // Import the SCSS
 import { useSocket } from "./../../context/Socket.IO.Context";
-import AskUsername from "../askUsername/AskUsername";
 import { generateCartoonHeroName } from "../../utils/randomizer.util";
 import { v4 as uuidv4 } from 'uuid';
 import { debounce } from "lodash";
@@ -39,35 +38,16 @@ export default function FullEditor() {
   const [language, setLanguage] = useState("javascript");
   const [output, setOutput] = useState("");
   const [loading, setLoading] = useState(false);
-  const [isDragging, setIsDragging] = useState(false);
-  const [dividerPosition, setDividerPosition] = useState(50); // percentage of column width for divider
-  const [isSavingModalData, setIsSavingModalData] = useState(false);
   const [cursors, setCursors] = useState({});
   const [isSocketConnected, setIsSocketConnected] = useState(false);
 
   const leftColumnRef = useRef();
   const rightColumnRef = useRef();
   // const modalRef = useRef();
-  const modalInstanceRef = useRef(null); // Ref for the modal instance
   const socket = useSocket();
 
   const [username] = useState(() => generateCartoonHeroName());
   const [sessionIdGenerated] = useState(() => uuidv4());
-
-  // TODO: Implement the modal instance
-  // useEffect(() => {
-  //   console.log("sessionId:", modalRef);
-  //   const interval = setInterval(() => {
-  //     if (modalRef.current) {
-  //       clearInterval(interval);
-  //       modalInstanceRef.current = new bootstrap.Modal(modalRef.current, {
-  //         keyboard: false,
-  //         backdrop: "static",
-  //       });
-  //       modalInstanceRef.current.show(); // Automatically show the modal
-  //     }
-  //   }, 500);
-  // }, []);
 
 
   // GraphQL hooks
@@ -233,25 +213,6 @@ export default function FullEditor() {
     }
   }
 
-  // Handle the divider drag logic
-  const startDrag = (e) => {
-    setIsDragging(true);
-    document.addEventListener("mousemove", onDrag);
-    document.addEventListener("mouseup", stopDrag);
-  };
-
-  const onDrag = (e) => {
-    if (!isDragging) return;
-    const newDividerPosition = Math.min(Math.max(0, (e.clientX / window.innerWidth) * 100), 100);
-    setDividerPosition(newDividerPosition);
-  };
-
-  const stopDrag = (e) => {
-    setIsDragging(false);
-    document.removeEventListener("mousemove", onDrag);
-    document.removeEventListener("mouseup", stopDrag);
-  };
-
   // Handle the Share Button functionality
   const shareSession = () => {
     const shareLink = `${window.location.href}`;
@@ -278,16 +239,6 @@ export default function FullEditor() {
       </div>
     );
   }
-
-  const saveUserData = (userData) => {
-    if (!userData.name || !userData.email) {
-      alert("Name and Email are required!");
-      return;
-    }
-    setIsSavingModalData(true);
-    modalInstanceRef.current.hide();
-    socket.emit(sessionId, { type: 'addUser', ...userData });
-  };
 
   return (
     <div className="full-editor">
