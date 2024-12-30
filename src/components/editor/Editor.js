@@ -191,7 +191,7 @@ const MonacoEditorWithSidebarAndHeader = ({
                     }}
                 >
                     {[
-                        { lang: "python", Icon: FaPython },
+                        // { lang: "python", Icon: FaPython },
                         { lang: "javascript", Icon: FaJs },
                     ].map(({ lang, Icon }, index) => (
                         <div
