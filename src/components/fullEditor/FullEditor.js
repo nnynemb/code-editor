@@ -1,36 +1,13 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
-import { gql, useMutation, useQuery } from '@apollo/client';
+import compilerService from './../../services/api';
 import Editor from '../editor/Editor';
 import Output from '../output/Output';
-import compilerService from './../../services/api';
 import './FullEditor.scss';  // Import the SCSS
 import { useSocket } from './../../context/Socket.IO.Context';
 import { generateCartoonHeroName } from '../../utils/randomizer.util';
 import { v4 as uuidv4 } from 'uuid';
 import { debounce } from 'lodash';
-
-// GraphQL Queries and Mutations
-const GET_SESSION = gql`
-  query GetSession($id: ID!) {
-    getSession(id: $id) {
-      id
-      language
-      content
-    }
-  }
-`;
-
-const UPDATE_SESSION = gql`
-  mutation UpdateSession($id: ID!, $language: String!, $content: String!) {
-    updateSession(id: $id, language: $language, content: $content) {
-      id
-      language
-      content
-      updatedAt
-    }
-  }
-`;
 
 export default function FullEditor() {
   const { sessionId } = useParams(); // Extract sessionId from URL
@@ -40,31 +17,46 @@ export default function FullEditor() {
   const [loading, setLoading] = useState(false);
   const [cursors, setCursors] = useState({});
   const [isSocketConnected, setIsSocketConnected] = useState(false);
+  const [saving, setSaving] = useState(false); // Track saving state
 
   const leftColumnRef = useRef();
   const rightColumnRef = useRef();
-  // const modalRef = useRef();
   const socket = useSocket();
 
   const [username] = useState(() => generateCartoonHeroName());
   const [sessionIdGenerated] = useState(() => uuidv4());
 
+  // Get session data
+  const [sessionData, setSessionData] = useState(null);
 
-  // GraphQL hooks
-  const { data, loading: loadingSession, error: sessionError } = useQuery(GET_SESSION, {
-    variables: { id: sessionId },
-    skip: !sessionId, // Skip query if sessionId is not available
-    onCompleted: (data) => {
-      setCode(data.getSession.content);
-      setLanguage(data.getSession.language);
-    },
-  });
+  useEffect(() => {
+    if (sessionId) {
+      // Fetch session data from the backend API
+      fetchSessionData(sessionId);
+    }
+  }, [sessionId]);
 
-  const [updateSession, { loading: saving, error: saveError }] = useMutation(UPDATE_SESSION, {
-    onError: (err) => {
-      console.error('Error updating session:', err.message);
-    },
-  });
+  const fetchSessionData = async (id) => {
+    try {
+      const response = await compilerService.getSession(id);
+      if (response) {
+        setCode(response.content);
+        setLanguage(response.language);
+        setSessionData(response);
+      }
+    } catch (error) {
+      console.error('Error fetching session:', error);
+    }
+  };
+
+  const updateSession = async (id, language, content) => {
+    try {
+      const response = await compilerService.updateSession(id, { language, content });
+      setSessionData(response);
+    } catch (error) {
+      console.error('Error updating session:', error);
+    }
+  };
 
   const streamCode = debounce((changedCode, language, username, sessionIdGenerated, cursorPosition) => {
     const data = {
@@ -86,8 +78,6 @@ export default function FullEditor() {
     streamCode(changedCode, language, username, sessionIdGenerated, cursorPosition);
   };
 
-
-
   const sendCodeToExecute = () => {
     executeCode(code, language);
   };
@@ -96,11 +86,11 @@ export default function FullEditor() {
     setOutput('');
   };
 
-  const saveCodeToDatabase = () => {
+  const saveCodeToDatabase = async () => {
     if (sessionId && language && code) {
-      updateSession({
-        variables: { id: sessionId, language, content: code },
-      });
+      setSaving(true); // Start saving
+      await updateSession(sessionId, language, code); // Save the session
+      setSaving(false); // End saving
     }
   };
 
@@ -124,7 +114,7 @@ export default function FullEditor() {
       socket.emit('joinRoom', sessionId); // Join the room after
     }
 
-    // get the code chnage events from the server
+    // get the code change events from the server
     socket && sessionId && socket.on(sessionId, (data) => {
       const channel = data.channel;
       const remotelanguage = data.language;
@@ -150,12 +140,10 @@ export default function FullEditor() {
     // get the output events from the server
     socket && sessionId && socket.on('output', (data) => {
       const { output, sessionId: sid } = data;
-
       if (sid === sessionId) {
         setOutputText(output);
       }
     });
-
 
     // get the command events from the server
     socket && sessionId && socket.on('command', (data) => {
@@ -175,15 +163,12 @@ export default function FullEditor() {
       }
     });
 
-
     return () => {
       socket && sessionId && socket.off(sessionId);
       socket && sessionId && socket.off('output');
       socket && sessionId && socket.off('command');
     };
-
   }, [socket, sessionId, sessionIdGenerated, code, language]);
-
 
   function setOutputText(output) {
     setOutput((previousOutput) => {
@@ -208,8 +193,7 @@ export default function FullEditor() {
     if (codeString && selectedLanguage && sessionId) {
       setLoading(true);
       const response = await compilerService.runCode({ code: codeString, language: selectedLanguage?.toLowerCase(), sessionId });
-      const text = await response.text();
-      setOutputText(text);
+      setOutputText(response);
     }
   }
 
@@ -226,18 +210,8 @@ export default function FullEditor() {
       });
   };
 
-  if (sessionError) {
-    return <div>Error loading session: {sessionError.message}</div>;
-  }
-
-  if (loadingSession) {
-    return (
-      <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
-        <div className="spinner-border m-5" role="status">
-          <span className="visually-hidden">Loading...</span>
-        </div>
-      </div>
-    );
+  if (sessionData === null) {
+    return <div>Loading...</div>;
   }
 
   return (
@@ -245,7 +219,8 @@ export default function FullEditor() {
       <div className="row g-0">
         <div className="col-8" ref={leftColumnRef}>
           <div className="editor-container">
-            <Editor onChange={onChange}
+            <Editor
+              onChange={onChange}
               handleSave={sendCodeToExecute}
               onRun={sendCodeToExecute}
               onSave={saveCodeToDatabase}
@@ -253,11 +228,12 @@ export default function FullEditor() {
               onShare={shareSession}
               setSelectedLanguage={setLanguage}
               executing={loading}
-              saving={saving}
+              saving={saving} // Use the saving state here
               code={code}
               language={language}
               cursors={cursors}
-              isSocketConnected={isSocketConnected} />
+              isSocketConnected={isSocketConnected}
+            />
           </div>
         </div>
         <div className="col-4" ref={rightColumnRef}>

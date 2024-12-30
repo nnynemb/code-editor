@@ -1,22 +1,9 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { gql, useMutation } from "@apollo/client";
-
-const CREATE_SESSION = gql`
-  mutation GenerateSession($language: String!, $content: String!) {
-    generateSession(language: $language, content: $content) {
-      id
-      language
-      content
-      createdAt
-      updatedAt
-    }
-  }
-`;
+import compilerService from "./../../services/api";
 
 function Home() {
   const navigate = useNavigate();
-  const [generateSession, { data, error }] = useMutation(CREATE_SESSION);
 
   const loaderStyle = {
     height: "100vh",
@@ -28,14 +15,15 @@ function Home() {
   useEffect(() => {
     const createSession = async () => {
       try {
-        const { data } = await generateSession({
-          variables: {
-            language: "JavaScript",
-            content: "console.log(`GraphQL with React is powerful!`);",
-          },
+        const session = await compilerService.createSession({
+          language: "JavaScript",
+          content: "console.log(`Using APIs with React is powerful!`);",
         });
-        if (data?.generateSession?.id) {
-          navigate(`/editor/${data.generateSession.id}`);
+
+        if (session?._id) {
+          navigate(`/editor/${session._id}`);
+        } else {
+          throw new Error("Failed to create session");
         }
       } catch (e) {
         console.error("Error creating session:", e.message);
@@ -43,11 +31,7 @@ function Home() {
     };
 
     createSession();
-  }, [generateSession, navigate]);
-
-  if (error) {
-    return <div>Error: Unable to create a session. Please try again later.</div>;
-  }
+  }, [navigate]);
 
   return (
     <div style={loaderStyle}>
