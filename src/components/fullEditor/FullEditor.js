@@ -1,14 +1,14 @@
-import { useState, useEffect, useRef } from "react";
-import { useParams } from "react-router-dom";
-import { gql, useMutation, useQuery } from "@apollo/client";
-import Editor from "../editor/Editor";
-import Output from "../output/Output";
-import compilerService from "./../../services/api";
-import "./FullEditor.scss";  // Import the SCSS
-import { useSocket } from "./../../context/Socket.IO.Context";
-import { generateCartoonHeroName } from "../../utils/randomizer.util";
+import { useState, useEffect, useRef } from 'react';
+import { useParams } from 'react-router-dom';
+import { gql, useMutation, useQuery } from '@apollo/client';
+import Editor from '../editor/Editor';
+import Output from '../output/Output';
+import compilerService from './../../services/api';
+import './FullEditor.scss';  // Import the SCSS
+import { useSocket } from './../../context/Socket.IO.Context';
+import { generateCartoonHeroName } from '../../utils/randomizer.util';
 import { v4 as uuidv4 } from 'uuid';
-import { debounce } from "lodash";
+import { debounce } from 'lodash';
 
 // GraphQL Queries and Mutations
 const GET_SESSION = gql`
@@ -34,9 +34,9 @@ const UPDATE_SESSION = gql`
 
 export default function FullEditor() {
   const { sessionId } = useParams(); // Extract sessionId from URL
-  const [code, setCode] = useState("");
-  const [language, setLanguage] = useState("javascript");
-  const [output, setOutput] = useState("");
+  const [code, setCode] = useState('');
+  const [language, setLanguage] = useState('javascript');
+  const [output, setOutput] = useState('');
   const [loading, setLoading] = useState(false);
   const [cursors, setCursors] = useState({});
   const [isSocketConnected, setIsSocketConnected] = useState(false);
@@ -62,13 +62,13 @@ export default function FullEditor() {
 
   const [updateSession, { loading: saving, error: saveError }] = useMutation(UPDATE_SESSION, {
     onError: (err) => {
-      console.error("Error updating session:", err.message);
+      console.error('Error updating session:', err.message);
     },
   });
 
   const streamCode = debounce((changedCode, language, username, sessionIdGenerated, cursorPosition) => {
     const data = {
-      code: changedCode || "", language, username,
+      code: changedCode || '', language, username,
       userId: sessionIdGenerated,
       cursor: {
         content: `${username} is typing...`,
@@ -82,7 +82,7 @@ export default function FullEditor() {
   const onChange = (changedCode, cursorPosition) => {
     if (!sessionId || !sessionIdGenerated) return;
     if (changedCode === code) return;
-    setCode(changedCode || "");
+    setCode(changedCode || '');
     streamCode(changedCode, language, username, sessionIdGenerated, cursorPosition);
   };
 
@@ -93,7 +93,7 @@ export default function FullEditor() {
   };
 
   const clearOutput = () => {
-    setOutput("");
+    setOutput('');
   };
 
   const saveCodeToDatabase = () => {
@@ -134,7 +134,7 @@ export default function FullEditor() {
       const userId = data.userId;
       if (userId && sessionIdGenerated && channel === sessionId && senderSocketId !== socket.id && userId !== sessionIdGenerated) {
         // Update the code only if it is different from the current code or empty
-        if (content !== code || content === "") setCode(content);
+        if (content !== code || content === '') setCode(content);
         if (remotelanguage !== language) setLanguage(language);
         if (cursor) {
           setCursors((previousCursors) => {
@@ -163,7 +163,7 @@ export default function FullEditor() {
       if (sid === sessionId) {
         switch (command) {
           case 'start':
-            setOutput("");
+            setOutput('');
             setLoading(true);
             break;
           case 'end':
@@ -218,11 +218,11 @@ export default function FullEditor() {
     const shareLink = `${window.location.href}`;
     navigator.clipboard.writeText(shareLink)
       .then(() => {
-        alert("Session link copied to clipboard!");
+        alert('Session link copied to clipboard!');
       })
       .catch((error) => {
-        console.error("Error copying to clipboard:", error);
-        alert("Failed to copy link.");
+        console.error('Error copying to clipboard:', error);
+        alert('Failed to copy link.');
       });
   };
 
@@ -232,7 +232,7 @@ export default function FullEditor() {
 
   if (loadingSession) {
     return (
-      <div className="d-flex justify-content-center align-items-center" style={{ height: "100vh" }}>
+      <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
         <div className="spinner-border m-5" role="status">
           <span className="visually-hidden">Loading...</span>
         </div>
