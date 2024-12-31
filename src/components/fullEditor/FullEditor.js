@@ -69,7 +69,7 @@ export default function FullEditor() {
     };
     // Emit with a callback for acknowledgment
     socket.emit(sessionId, data);
-  }, 1000); // Debounce the function to avoid sending too many events
+  }, 300); // Debounce the function to avoid sending too many events
 
   const onChange = (changedCode, cursorPosition) => {
     if (!sessionId || !sessionIdGenerated) return;
