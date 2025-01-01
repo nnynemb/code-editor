@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "./App.scss";
 import FullEditor from "./components/fullEditor/FullEditor";
-import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Home from "./components/home/Home";
 import { SocketProvider } from "./context/Socket.IO.Context";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -31,7 +31,7 @@ function App() {
       <Router>
         <Routes>
           {/* Public Routes */}
-          <Route path="/login" element={!user ? <Login /> : <Navigate to="/" />} />
+          <Route path="/login" element={<Login />} />
 
           {/* Protected Routes */}
           <Route

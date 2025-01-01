@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import compilerService from "./../../services/api";
 
 function Home({user}) {
-  console.log("User:", user);
   const navigate = useNavigate();
 
   const loaderStyle = {
