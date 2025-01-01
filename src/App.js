@@ -16,7 +16,6 @@ function App() {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      console.log("Auth state changed:", currentUser);
       setUser(currentUser);
       setIsAuthChecked(true);
     });
@@ -39,7 +38,7 @@ function App() {
             path="/"
             element={
               <ProtectedComponenet user={user}>
-                <Home />
+                <Home user={user} />
               </ProtectedComponenet>
             }
           />
