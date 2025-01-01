@@ -234,6 +234,8 @@ export default function FullEditor({ user }) {
               language={language}
               cursors={cursors}
               isSocketConnected={isSocketConnected}
+              user={user}
+              sessionOwner={sessionData?.userId}
             />
           </div>
         </div>

@@ -16,10 +16,13 @@ const MonacoEditorWithSidebarAndHeader = ({
     executing = false,
     saving = false,
     isSocketConnected, // Connection status from props
+    sessionOwner, // Session owner from props
+    user, // User from props
 }) => {
     const editorRef = useRef(null);
     const monacoRef = useRef(null);
     const [visibleTooltips, setVisibleTooltips] = useState({});
+    const isCodeOwner = sessionOwner && sessionOwner === user?.uid;
 
     const handleEditorDidMount = (editor, monaco) => {
         editorRef.current = editor;
@@ -136,7 +139,7 @@ const MonacoEditorWithSidebarAndHeader = ({
                     </div>
                     <div
                         onClick={() => {
-                            if (!saving) {
+                            if (!saving && isCodeOwner) {
                                 onSave();
                             }
                         }}
@@ -144,7 +147,7 @@ const MonacoEditorWithSidebarAndHeader = ({
                             display: "flex",
                             alignItems: "center",
                             cursor: saving ? "not-allowed" : "pointer",
-                            opacity: saving ? 0.5 : 1,
+                            opacity: saving || !isCodeOwner ? 0.5 : 1,
                             transition: "all 0.3s",
                         }}
                     >
@@ -153,7 +156,7 @@ const MonacoEditorWithSidebarAndHeader = ({
                             title="Save Code"
                             style={{
                                 borderRadius: "50%",
-                                backgroundColor: saving ? "#ccc" : "#4CAF50",
+                                backgroundColor: saving || !isCodeOwner ? "#ccc" : "#4CAF50",
                                 padding: "5px",
                                 transition: "background-color 0.3s",
                                 animation: saving ? "spin 1s linear infinite" : "none",
