@@ -9,7 +9,7 @@ import { generateCartoonHeroName } from '../../utils/randomizer.util';
 import { v4 as uuidv4 } from 'uuid';
 import { debounce } from 'lodash';
 
-export default function FullEditor() {
+export default function FullEditor({user}) {
   const { sessionId } = useParams(); // Extract sessionId from URL
   const [code, setCode] = useState('');
   const [language, setLanguage] = useState('javascript');
@@ -238,7 +238,7 @@ export default function FullEditor() {
         </div>
         <div className="col-4" ref={rightColumnRef}>
           <div className="output-container">
-            <Output output={output} />
+            <Output output={output} user={user}/>
           </div>
         </div>
       </div>

@@ -1,9 +1,11 @@
 import { Editor } from "@monaco-editor/react";
+import { useState, useEffect, useRef } from "react";
 import "./Output.scss";
-import { useEffect, useRef } from "react";
+import { signOut, auth } from "../../services/firebase";
 
-const Output = ({ output, onRun, onSave, onShare, onSettings }) => {
+const Output = ({ output, user }) => {
     const editorRef = useRef(null);
+    const [showLogout, setShowLogout] = useState(false);
 
     const handleEditorDidMount = (editor) => {
         editorRef.current = editor;
@@ -15,6 +17,15 @@ const Output = ({ output, onRun, onSave, onShare, onSettings }) => {
             editor.getModel().setValue(output);
         }
     }, [output]);
+
+    const toggleLogoutMenu = () => {
+        setShowLogout((prev) => !prev);
+    };
+
+    const handleLogout = () => {
+        setShowLogout(false);
+        signOut(auth);
+    };
 
     return (
         <div style={{ height: "100vh", display: "flex", flexDirection: "column" }}>
@@ -31,7 +42,50 @@ const Output = ({ output, onRun, onSave, onShare, onSettings }) => {
             >
                 {/* Header Title */}
                 <div style={{ fontSize: "18px", fontWeight: "bold" }}>Output Viewer</div>
-
+                <div style={{ position: "relative", display: "flex", alignItems: "center", gap: "10px" }}>
+                    <div
+                        style={{ display: "flex", alignItems: "center", cursor: "pointer", gap: "10px" }}
+                        onClick={toggleLogoutMenu}
+                    >
+                        <img
+                            src={user?.photoURL}
+                            alt="User Avatar"
+                            className="rounded-circle"
+                            style={{ width: "30px", height: "30px" }}
+                        />
+                        <p className="fw-bold" style={{ fontSize: "14px", margin: 0 }}>
+                            {user?.displayName}
+                        </p>
+                    </div>
+                    {showLogout && (
+                        <div
+                            style={{
+                                position: "absolute",
+                                top: "40px",
+                                right: "0",
+                                backgroundColor: "white",
+                                color: "black",
+                                boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)",
+                                borderRadius: "4px",
+                                zIndex: 10,
+                            }}
+                        >
+                            <button
+                                onClick={handleLogout}
+                                style={{
+                                    padding: "8px 16px",
+                                    border: "none",
+                                    backgroundColor: "transparent",
+                                    cursor: "pointer",
+                                    textAlign: "left",
+                                    width: "100%",
+                                }}
+                            >
+                                Logout
+                            </button>
+                        </div>
+                    )}
+                </div>
             </div>
 
             {/* Monaco Editor */}
