@@ -23,7 +23,8 @@ export default function FullEditor({user}) {
   const rightColumnRef = useRef();
   const socket = useSocket();
 
-  const [username] = useState(() => generateCartoonHeroName());
+  // Generate a random username and session ID
+  const [username] = useState(() => user?.displayName || generateCartoonHeroName());
   const [sessionIdGenerated] = useState(() => uuidv4());
 
   // Get session data

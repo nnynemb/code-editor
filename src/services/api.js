@@ -18,7 +18,6 @@ const getAuthToken = async () => {
 
 const addAuthHeader = async () => {
   const token = await getAuthToken();
-  console.log("Token:", token);
   return token ? { Authorization: `Bearer ${token}` } : {};
 };
 
